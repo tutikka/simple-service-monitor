@@ -12,6 +12,7 @@ public class SSM {
 	
 	public static void main(String[] args) {
 		logger.i("main");
+		System.setProperty("apple.laf.useScreenMenuBar", "true");
 		Runnable runnable = new Runnable() {
 			@Override
 			public void run() {
