@@ -1,7 +1,6 @@
 package com.tt.ssm.view;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -176,14 +175,12 @@ public class URLServiceDialog extends JDialog implements ActionListener {
 		panel.add(warningLabel);
 		
 		warning = new JTextField("1000", 24);
-		warning.setBackground(Color.YELLOW);
 		panel.add(warning);
 		
 		JLabel errorLabel = new JLabel("* Error threshold (ms)");
 		panel.add(errorLabel);
 		
 		error = new JTextField("5000", 24);
-		error.setBackground(Color.RED);
 		panel.add(error);
 		
 		SpringLayout sl = new SpringLayout();
