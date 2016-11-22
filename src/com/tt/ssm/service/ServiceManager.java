@@ -18,13 +18,14 @@ public class ServiceManager {
 	
 	private ScheduledExecutorService ses;
 	
-	private Callback callback;
+	private List<Callback> callbacks;
 	
 	private List<FutureWrapper> futures;
 	
 	private ServiceManager() {
 		logger.i("init");
 		ses = Executors.newScheduledThreadPool(10);
+		callbacks = new ArrayList<>();
 		futures = new ArrayList<>();
 	}
 	
@@ -35,13 +36,31 @@ public class ServiceManager {
 		return (instance);
 	}
 	
-	public void addCallback(Callback callback) {
-		this.callback = callback;
+	public synchronized void registerCallback(Callback callback) {
+		logger.i("registerCallback");
+		if (!callbacks.contains(callback)) {
+			logger.i("registering callback " + callback.getClass().getName());
+			callbacks.add(callback);
+		} else {
+			logger.w("callback " + callback.getClass().getName() + " has already been registered");
+		}
+		logger.i("registerCallback completed");
+	}
+	
+	public synchronized void unregisterCallback(Callback callback) {
+		logger.i("unregisterCallback");
+		if (callbacks.contains(callback)) {
+			logger.i("unregistering callback " + callback.getClass().getName());
+			callbacks.remove(callback);
+		} else {
+			logger.w("callback " + callback.getClass().getName() + " has already been unregistered");
+		}
+		logger.i("unregisterCallback completed");
 	}
 	
 	public void schedule(Service service) {
 		logger.i("schedule");
-		ScheduledFuture<?> future = ses.scheduleAtFixedRate(new ServiceRunner(service, callback), 0, service.getInterval(), TimeUnit.MILLISECONDS);
+		ScheduledFuture<?> future = ses.scheduleAtFixedRate(new ServiceRunner(service, callbacks), 0, service.getInterval(), TimeUnit.MILLISECONDS);
 		futures.add(new FutureWrapper(future, service.getId()));
 		logger.i("schedule completed");
 	}

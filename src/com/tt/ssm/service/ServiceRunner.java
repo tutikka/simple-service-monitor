@@ -1,5 +1,7 @@
 package com.tt.ssm.service;
 
+import java.util.List;
+
 import com.tt.ssm.misc.Logger;
 import com.tt.ssm.service.ServiceManager.Callback;
 
@@ -9,19 +11,21 @@ public class ServiceRunner implements Runnable {
 	
 	private Service service;
 	
-	private Callback callback;
+	private List<Callback> callbacks;
 	
-	public ServiceRunner(Service service, Callback callback) {
+	public ServiceRunner(Service service, List<Callback> callbacks) {
 		logger.i("init");
 		this.service = service;
-		this.callback = callback;
+		this.callbacks = callbacks;
 	}
 
 	@Override
 	public void run() {
 		logger.i("run");
 		service.request();
-		callback.onServiceResponded(service);
+		for (Callback callback : callbacks) {
+			callback.onServiceResponded(service);
+		}
 		logger.i("run completed");
 	}
 	

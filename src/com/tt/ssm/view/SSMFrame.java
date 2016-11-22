@@ -59,7 +59,7 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 		add(createFilter(), BorderLayout.NORTH);
 		add(createContent(), BorderLayout.CENTER);
 		setVisible(true);
-		ServiceManager.getInstance().addCallback(this);
+		ServiceManager.getInstance().registerCallback(this);
 	}
 
 	@Override
@@ -76,6 +76,7 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 		if ("exit".equals(e.getActionCommand())) {
 			int result = JOptionPane.showConfirmDialog(this, "Are you sure?", "Exit", JOptionPane.YES_NO_OPTION);
 			if (result == JOptionPane.YES_OPTION) {
+				ServiceManager.getInstance().unregisterCallback(this);
 				ServiceManager.getInstance().close();
 				dispose();
 			}
@@ -108,7 +109,10 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 				return;
 			}
 			ServiceRow row = ctm.getServiceRow(modelRow);
-			// TODO
+			ServiceDetailsDialog dialog = new ServiceDetailsDialog(this, row);
+			ServiceManager.getInstance().registerCallback(dialog);
+			dialog.setVisible(true);
+			ServiceManager.getInstance().unregisterCallback(dialog);
 		}
 	}
 
