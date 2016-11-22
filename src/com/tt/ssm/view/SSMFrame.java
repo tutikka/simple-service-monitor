@@ -22,8 +22,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
@@ -45,6 +45,8 @@ import com.tt.ssm.service.impl.URLService;
 public class SSMFrame extends JFrame implements ActionListener, MouseListener, URLServiceDialog.Callback, TCPServiceDialog.Callback, JDBCServiceDialog.Callback, ServiceManager.Callback {
 	
 	private CustomTableModel ctm = new CustomTableModel();
+	
+	private CustomTable table;
 	
 	private TableRowSorter<CustomTableModel> trs = new TableRowSorter<CustomTableModel>(ctm);
 	
@@ -94,12 +96,66 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 			sb.append(Constants.DATE);
 			JOptionPane.showMessageDialog(this, sb.toString(), "About", JOptionPane.INFORMATION_MESSAGE);
 		}
+		if ("open".equals(e.getActionCommand())) {
+			int tableRow = table.getSelectedRow();
+			if (tableRow == -1) {
+				return;
+			}
+			int modelRow = table.convertRowIndexToModel(tableRow);
+			if (modelRow == -1) {
+				return;
+			}
+			Service service = ctm.getService(modelRow);
+			ServiceDetailsDialog dialog = new ServiceDetailsDialog(this, service);
+			ServiceManager.getInstance().registerCallback(dialog);
+			dialog.setVisible(true);
+			ServiceManager.getInstance().unregisterCallback(dialog);
+		}
+		if ("start".equals(e.getActionCommand())) {
+			int tableRow = table.getSelectedRow();
+			if (tableRow == -1) {
+				return;
+			}
+			int modelRow = table.convertRowIndexToModel(tableRow);
+			if (modelRow == -1) {
+				return;
+			}
+			Service service = ctm.getService(modelRow);
+			ServiceManager.getInstance().schedule(service);
+		}
+		if ("stop".equals(e.getActionCommand())) {
+			int tableRow = table.getSelectedRow();
+			if (tableRow == -1) {
+				return;
+			}
+			int modelRow = table.convertRowIndexToModel(tableRow);
+			if (modelRow == -1) {
+				return;
+			}
+			Service service = ctm.getService(modelRow);
+			ServiceManager.getInstance().cancel(service);
+		}
+		if ("delete".equals(e.getActionCommand())) {
+			int tableRow = table.getSelectedRow();
+			if (tableRow == -1) {
+				return;
+			}
+			int modelRow = table.convertRowIndexToModel(tableRow);
+			if (modelRow == -1) {
+				return;
+			}
+			int result = JOptionPane.showConfirmDialog(this, "Are you sure?", "Delete", JOptionPane.YES_NO_OPTION);
+			if (result == JOptionPane.YES_OPTION) {
+				Service service = ctm.getService(modelRow);
+				ServiceManager.getInstance().cancel(service);
+				ctm.remove(service);
+			}
+		}
 	}
 	
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
-			JTable table = (JTable) e.getSource();
 			int tableRow = table.rowAtPoint(e.getPoint());
 			if (tableRow == -1) {
 				return;
@@ -108,8 +164,8 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 			if (modelRow == -1) {
 				return;
 			}
-			ServiceRow row = ctm.getServiceRow(modelRow);
-			ServiceDetailsDialog dialog = new ServiceDetailsDialog(this, row);
+			Service service = ctm.getService(modelRow);
+			ServiceDetailsDialog dialog = new ServiceDetailsDialog(this, service);
 			ServiceManager.getInstance().registerCallback(dialog);
 			dialog.setVisible(true);
 			ServiceManager.getInstance().unregisterCallback(dialog);
@@ -134,27 +190,27 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 
 	@Override
 	public void onJDBCServiceAdded(JDBCService service) {
-		ctm.updateFromService(service);
+		ctm.update(service);
 		ServiceManager.getInstance().schedule(service);
 	}
 	
 	@Override
 	public void onTCPServiceAdded(TCPService service) {
-		ctm.updateFromService(service);
+		ctm.update(service);
 		ServiceManager.getInstance().schedule(service);
 	}
 	
 	@Override
 	public void onURLServiceAdded(URLService service) {
-		ctm.updateFromService(service);
+		ctm.update(service);
 		ServiceManager.getInstance().schedule(service);
 	}
 
 	@Override
 	public void onServiceResponded(Service service) {
-		ctm.updateFromService(service);
+		ctm.update(service);
 	}
-
+	
 	private void applyFilter(String filter, int column) {
         RowFilter<CustomTableModel, Object> rf = null;
         try {
@@ -169,14 +225,11 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 		JPanel panel = new JPanel();
 		panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
 		panel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 0));
-		
 		panel.add(new JLabel("Filter:"));
-		
 		final JComboBox<String> column = new JComboBox<>(new String[]{"Name", "Group", "Type", "Destination", "Status", "Time", "Message", "Updated"});
 		final JTextField filter = new JTextField("", 24);
 		final JButton clear = new JButton("Clear");
 		clear.setEnabled(false);
-		
 		column.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
@@ -184,20 +237,17 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 			}
 		});
 		panel.add(column);
-		
 		filter.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void removeUpdate(DocumentEvent e) {
 				applyFilter(filter.getText(), column.getSelectedIndex());
 				clear.setEnabled(!filter.getText().isEmpty());
 			}
-			
 			@Override
 			public void insertUpdate(DocumentEvent e) {
 				applyFilter(filter.getText(), column.getSelectedIndex());
 				clear.setEnabled(!filter.getText().isEmpty());
 			}
-			
 			@Override
 			public void changedUpdate(DocumentEvent e) {
 				applyFilter(filter.getText(), column.getSelectedIndex());
@@ -205,7 +255,6 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 			}
 		});
 		panel.add(filter);
-		
 		clear.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -214,20 +263,38 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 			}
 		});
 		panel.add(clear);
-		
 		filter.setPreferredSize(clear.getPreferredSize());
-		
 		return (panel);
 	}
 	
 	private JComponent createContent() {
-		CustomTable table = new CustomTable(ctm);
+		table = new CustomTable(ctm);
 		table.setBorder(BorderFactory.createEmptyBorder());
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		table.setDefaultRenderer(String.class, new CustomTableCellRenderer());
 		table.addMouseListener(this);
 		table.setRowSorter(trs);
 		table.setFillsViewportHeight(true);
+	    JPopupMenu popupMenu = new JPopupMenu();
+	    JMenuItem open = new JMenuItem("Open");
+	    open.setActionCommand("open");
+	    open.addActionListener(this);
+	    JMenuItem start = new JMenuItem("Start");
+	    start.setActionCommand("start");
+	    start.addActionListener(this);
+	    JMenuItem stop = new JMenuItem("Stop");
+	    stop.setActionCommand("stop");
+	    stop.addActionListener(this);
+	    JMenuItem delete = new JMenuItem("Delete");
+	    delete.setActionCommand("delete");
+	    delete.addActionListener(this);
+	    popupMenu.add(open);
+	    popupMenu.addSeparator();
+	    popupMenu.add(start);
+	    popupMenu.add(stop);
+	    popupMenu.addSeparator();
+	    popupMenu.add(delete);
+	    table.setComponentPopupMenu(popupMenu);
 		JScrollPane jsp = new JScrollPane(table);
 		JPanel panel = new JPanel();
 		panel.setLayout(new GridLayout(1, 1));
@@ -238,43 +305,33 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 	
 	private JMenuBar createMenuBar() {
 		JMenuBar menuBar = new JMenuBar();
-		
 		JMenu file = new JMenu("File");
-		
 		JMenuItem addService = new JMenu("Add service...");
-		
 		JMenuItem jdbcService = new JMenuItem("JDBC service");
 		jdbcService.setActionCommand("jdbcService");
 		jdbcService.addActionListener(this);
 		addService.add(jdbcService);
-		
 		JMenuItem tcpService = new JMenuItem("TCP service");
 		tcpService.setActionCommand("tcpService");
 		tcpService.addActionListener(this);
 		addService.add(tcpService);
-		
 		JMenuItem urlService = new JMenuItem("URL service");
 		urlService.setActionCommand("urlService");
 		urlService.addActionListener(this);
 		addService.add(urlService);
-		
 		file.add(addService);
-		
 		file.addSeparator();
-		
 		JMenuItem exit = new JMenuItem("Exit");
 		exit.setActionCommand("exit");
 		exit.addActionListener(this);
 		file.add(exit);
 		menuBar.add(file);
-		
 		JMenu help = new JMenu("Help");
 		JMenuItem about = new JMenuItem("About");
 		about.setActionCommand("about");
 		about.addActionListener(this);
 		help.add(about);
 		menuBar.add(help);
-		
 		return (menuBar);
 	}
 	

@@ -65,11 +65,11 @@ public class ServiceManager {
 		logger.i("schedule completed");
 	}
 	
-	public void cancel(String id) {
+	public void cancel(Service service) {
 		logger.i("cancel");
 		for (Iterator<FutureWrapper> iterator = futures.iterator(); iterator.hasNext(); ) {
 			FutureWrapper wrapper = iterator.next();
-			if (wrapper.getId().equals(id)) {
+			if (wrapper.getId().equals(service.getId())) {
 				logger.i("cancelling service " + wrapper.getId());
 				wrapper.getFuture().cancel(false);
 				iterator.remove();

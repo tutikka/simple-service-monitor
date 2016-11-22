@@ -1,6 +1,7 @@
 package com.tt.ssm.view;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -34,11 +35,11 @@ public class ServiceDetailsDialog extends JDialog implements ActionListener, Cal
 	
 	private JFreeChart chart;
 
-	private ServiceRow row;
+	private Service service;
 	
-	public ServiceDetailsDialog(JFrame parent, ServiceRow row) {
+	public ServiceDetailsDialog(JFrame parent, Service service) {
 		super(parent);
-		this.row = row;
+		this.service = service;
 		setTitle("Service Details");
 		
 		setSize(DIALOG_WIDTH, DIALOG_HEIGHT);
@@ -65,7 +66,7 @@ public class ServiceDetailsDialog extends JDialog implements ActionListener, Cal
 	
 	@Override
 	public void onServiceResponded(Service service) {
-		if (service.getId().equals(row.getId())) {
+		if (service.equals(this.service)) {
 			series.add(new Second(), service.getResponse().getTime());
 		}
 	}
@@ -74,7 +75,7 @@ public class ServiceDetailsDialog extends JDialog implements ActionListener, Cal
 		series = new TimeSeries("Time");
 		TimeSeriesCollection collection = new TimeSeriesCollection(series);
 		chart = ChartFactory.createTimeSeriesChart(
-	            row.getName(), 
+	            service.getName(), 
 	            "Updated",
 	            "Time (ms)",
 	            collection, 
@@ -82,6 +83,7 @@ public class ServiceDetailsDialog extends JDialog implements ActionListener, Cal
 	            false, 
 	            false);
 		chart.setAntiAlias(true);
+		chart.setBackgroundPaint(new Color(0, 0, 0, 0));
 	    XYPlot plot = chart.getXYPlot();
 	    ValueAxis domain = plot.getDomainAxis();
 	    domain.setAutoRange(true);
