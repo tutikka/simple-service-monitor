@@ -17,19 +17,22 @@ public class CustomTableModel extends AbstractTableModel {
 	
 	public void update(Service service) {
 		if (services.contains(service)) {
-			Service existing = services.get(services.indexOf(service));
+			int index = services.indexOf(service);
+			Service existing = services.get(index);
 			existing.setResponse(service.getResponse());
+			fireTableRowsUpdated(index, index);
 		} else {
 			services.add(service);
+			fireTableRowsInserted(services.size() - 1, services.size() - 1);
 		}
-		fireTableDataChanged();
 	}
 	
 	public void remove(Service service) {
 		if (services.contains(service)) {
-			services.remove(service);
+			int index = services.indexOf(service);
+			services.remove(index);
+			fireTableRowsDeleted(index, index);
 		}
-		fireTableDataChanged();
 	}
 	
 	public Service getService(int row) {
