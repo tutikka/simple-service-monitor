@@ -2,6 +2,7 @@ package com.tt.ssm.view;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -67,108 +68,167 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if ("jdbcService".equals(e.getActionCommand())) {
-			new JDBCServiceDialog(this, this).setVisible(true);
+			EventQueue.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					new JDBCServiceDialog(SSMFrame.this, SSMFrame.this).setVisible(true);
+				}
+			});
+			
 		}
 		if ("tcpService".equals(e.getActionCommand())) {
-			new TCPServiceDialog(this, this).setVisible(true);
+			EventQueue.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					new TCPServiceDialog(SSMFrame.this, SSMFrame.this).setVisible(true);
+				}
+			});
+			
 		}
 		if ("urlService".equals(e.getActionCommand())) {
-			new URLServiceDialog(this, this).setVisible(true);
+			EventQueue.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					new URLServiceDialog(SSMFrame.this, SSMFrame.this).setVisible(true);
+				}
+			});
+			
 		}
 		if ("exit".equals(e.getActionCommand())) {
-			int result = JOptionPane.showConfirmDialog(this, "Are you sure?", "Exit", JOptionPane.YES_NO_OPTION);
-			if (result == JOptionPane.YES_OPTION) {
-				ServiceManager.getInstance().unregisterCallback(this);
-				ServiceManager.getInstance().close();
-				dispose();
-			}
+			EventQueue.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					int result = JOptionPane.showConfirmDialog(SSMFrame.this, "Are you sure?", "Exit", JOptionPane.YES_NO_OPTION);
+					if (result == JOptionPane.YES_OPTION) {
+						ServiceManager.getInstance().unregisterCallback(SSMFrame.this);
+						ServiceManager.getInstance().close();
+						dispose();
+					}
+				}
+			});
+
 		}
 		if ("about".equals(e.getActionCommand())) {
-			StringBuilder sb = new StringBuilder();
-			sb.append(Constants.TITLE);
-			sb.append("\n");
-			sb.append("Version ");
-			sb.append(Constants.VERSION);
-			sb.append("\n");
-			sb.append("Created by ");
-			sb.append(Constants.AUTHOR);
-			sb.append("\n");
-			sb.append(Constants.DATE);
-			JOptionPane.showMessageDialog(this, sb.toString(), "About", JOptionPane.INFORMATION_MESSAGE);
+			EventQueue.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					StringBuilder sb = new StringBuilder();
+					sb.append(Constants.TITLE);
+					sb.append("\n");
+					sb.append("Version ");
+					sb.append(Constants.VERSION);
+					sb.append("\n");
+					sb.append("Created by ");
+					sb.append(Constants.AUTHOR);
+					sb.append("\n");
+					sb.append(Constants.DATE);
+					JOptionPane.showMessageDialog(SSMFrame.this, sb.toString(), "About", JOptionPane.INFORMATION_MESSAGE);
+				}
+			});
+
 		}
 		if ("open".equals(e.getActionCommand())) {
-			int tableRow = table.getSelectedRow();
+			final int tableRow = table.getSelectedRow();
 			if (tableRow == -1) {
 				return;
 			}
-			int modelRow = table.convertRowIndexToModel(tableRow);
+			final int modelRow = table.convertRowIndexToModel(tableRow);
 			if (modelRow == -1) {
 				return;
 			}
-			Service service = ctm.getService(modelRow);
-			ServiceDetailsDialog dialog = new ServiceDetailsDialog(this, service);
-			ServiceManager.getInstance().registerCallback(dialog);
-			dialog.setVisible(true);
-			ServiceManager.getInstance().unregisterCallback(dialog);
+			EventQueue.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					Service service = ctm.getService(modelRow);
+					ServiceDetailsDialog dialog = new ServiceDetailsDialog(SSMFrame.this, service);
+					ServiceManager.getInstance().registerCallback(dialog);
+					dialog.setVisible(true);
+					ServiceManager.getInstance().unregisterCallback(dialog);
+				}
+			});
+
 		}
 		if ("start".equals(e.getActionCommand())) {
-			int tableRow = table.getSelectedRow();
+			final int tableRow = table.getSelectedRow();
 			if (tableRow == -1) {
 				return;
 			}
-			int modelRow = table.convertRowIndexToModel(tableRow);
+			final int modelRow = table.convertRowIndexToModel(tableRow);
 			if (modelRow == -1) {
 				return;
 			}
-			Service service = ctm.getService(modelRow);
-			ServiceManager.getInstance().schedule(service);
+			EventQueue.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					Service service = ctm.getService(modelRow);
+					ServiceManager.getInstance().schedule(service);
+				}
+			});
 		}
 		if ("stop".equals(e.getActionCommand())) {
-			int tableRow = table.getSelectedRow();
+			final int tableRow = table.getSelectedRow();
 			if (tableRow == -1) {
 				return;
 			}
-			int modelRow = table.convertRowIndexToModel(tableRow);
+			final int modelRow = table.convertRowIndexToModel(tableRow);
 			if (modelRow == -1) {
 				return;
 			}
-			Service service = ctm.getService(modelRow);
-			ServiceManager.getInstance().cancel(service);
+			EventQueue.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					Service service = ctm.getService(modelRow);
+					ServiceManager.getInstance().cancel(service);
+				}
+			});
+
 		}
 		if ("delete".equals(e.getActionCommand())) {
-			int tableRow = table.getSelectedRow();
+			final int tableRow = table.getSelectedRow();
 			if (tableRow == -1) {
 				return;
 			}
-			int modelRow = table.convertRowIndexToModel(tableRow);
+			final int modelRow = table.convertRowIndexToModel(tableRow);
 			if (modelRow == -1) {
 				return;
 			}
-			int result = JOptionPane.showConfirmDialog(this, "Are you sure?", "Delete", JOptionPane.YES_NO_OPTION);
-			if (result == JOptionPane.YES_OPTION) {
-				Service service = ctm.getService(modelRow);
-				ServiceManager.getInstance().cancel(service);
-				ctm.remove(service);
-			}
+			EventQueue.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					int result = JOptionPane.showConfirmDialog(SSMFrame.this, "Are you sure?", "Delete", JOptionPane.YES_NO_OPTION);
+					if (result == JOptionPane.YES_OPTION) {
+						Service service = ctm.getService(modelRow);
+						ServiceManager.getInstance().cancel(service);
+						ctm.remove(service);
+					}
+				}
+			});
+
 		}
 	}
 	
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
-			int tableRow = table.rowAtPoint(e.getPoint());
+			final int tableRow = table.rowAtPoint(e.getPoint());
 			if (tableRow == -1) {
 				return;
 			}
-			int modelRow = table.convertRowIndexToModel(tableRow);
+			final int modelRow = table.convertRowIndexToModel(tableRow);
 			if (modelRow == -1) {
 				return;
 			}
-			Service service = ctm.getService(modelRow);
-			ServiceDetailsDialog dialog = new ServiceDetailsDialog(this, service);
-			ServiceManager.getInstance().registerCallback(dialog);
-			dialog.setVisible(true);
-			ServiceManager.getInstance().unregisterCallback(dialog);
+			EventQueue.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					Service service = ctm.getService(modelRow);
+					ServiceDetailsDialog dialog = new ServiceDetailsDialog(SSMFrame.this, service);
+					ServiceManager.getInstance().registerCallback(dialog);
+					dialog.setVisible(true);
+					ServiceManager.getInstance().unregisterCallback(dialog);
+				}
+			});
+
 		}
 	}
 
@@ -189,26 +249,50 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 	}
 
 	@Override
-	public void onJDBCServiceAdded(JDBCService service) {
-		ctm.update(service);
-		ServiceManager.getInstance().schedule(service);
+	public void onJDBCServiceAdded(final JDBCService service) {
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				ctm.update(service);
+				ServiceManager.getInstance().schedule(service);
+			}
+		});
+
 	}
 	
 	@Override
-	public void onTCPServiceAdded(TCPService service) {
-		ctm.update(service);
-		ServiceManager.getInstance().schedule(service);
+	public void onTCPServiceAdded(final TCPService service) {
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				ctm.update(service);
+				ServiceManager.getInstance().schedule(service);
+			}
+		});
+
 	}
 	
 	@Override
-	public void onURLServiceAdded(URLService service) {
-		ctm.update(service);
-		ServiceManager.getInstance().schedule(service);
+	public void onURLServiceAdded(final URLService service) {
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				ctm.update(service);
+				ServiceManager.getInstance().schedule(service);
+			}
+		});
+
 	}
 
 	@Override
-	public void onServiceResponded(Service service) {
-		ctm.update(service);
+	public void onServiceResponded(final Service service) {
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				ctm.update(service);
+			}
+		});
+		
 	}
 	
 	private void applyFilter(String filter, int column) {

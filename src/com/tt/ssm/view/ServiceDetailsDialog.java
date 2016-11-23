@@ -11,6 +11,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -65,9 +66,14 @@ public class ServiceDetailsDialog extends JDialog implements ActionListener, Cal
 	}
 	
 	@Override
-	public void onServiceResponded(Service service) {
+	public void onServiceResponded(final Service service) {
 		if (service.equals(this.service)) {
-			series.add(new Second(), service.getResponse().getTime());
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					series.add(new Second(), service.getResponse().getTime());
+				}
+			});	
 		}
 	}
 
@@ -89,7 +95,7 @@ public class ServiceDetailsDialog extends JDialog implements ActionListener, Cal
 	    domain.setAutoRange(true);
 	    domain.setFixedAutoRange(60 * 1000); // 60 seconds
 	    ValueAxis range = plot.getRangeAxis();
-	    range.setAutoRange(true);
+	    range.setRange(0, service.getError());
 	    ChartPanel panel = new ChartPanel(chart);
 	    panel.setOpaque(false);
 		panel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(5, 5, 0, 5), BorderFactory.createRaisedBevelBorder()));

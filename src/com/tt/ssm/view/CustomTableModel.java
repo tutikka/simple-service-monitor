@@ -73,7 +73,7 @@ public class CustomTableModel extends AbstractTableModel {
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		Service service = services.get(rowIndex);
-		if (service != null) {
+		if (service != null && service.getResponse() != null) {
 			switch (columnIndex) {
 			case 0 : return (service.getName());
 			case 1 : return (service.getGroup());
