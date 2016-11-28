@@ -36,6 +36,8 @@ public class URLServiceDialog extends JDialog implements ActionListener {
 	
 	private JTextField url;
 	
+	private JTextField expectedResponseCode;
+	
 	private JTextField interval;
 	
 	private JTextField warning;
@@ -101,6 +103,18 @@ public class URLServiceDialog extends JDialog implements ActionListener {
 			JOptionPane.showMessageDialog(this, "Please enter the URL", "Warning", JOptionPane.WARNING_MESSAGE);
 			return (null);
 		}
+		// expected response code
+		int expectedResponseCode;
+		try {
+			expectedResponseCode = Integer.parseInt(this.expectedResponseCode.getText());
+			if (expectedResponseCode < 100 || expectedResponseCode > 599) {
+				JOptionPane.showMessageDialog(this, "Please enter a valid response code (100 - 599)", "Warning", JOptionPane.WARNING_MESSAGE);
+				return (null);
+			}
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(this, "Please enter a valid response code (100 - 599)", "Warning", JOptionPane.WARNING_MESSAGE);
+			return (null);
+		}
 		// interval
 		long interval;
 		try {
@@ -137,7 +151,7 @@ public class URLServiceDialog extends JDialog implements ActionListener {
 			JOptionPane.showMessageDialog(this, "Please enter a valid error threshold (0 - 600000)", "Warning", JOptionPane.WARNING_MESSAGE);
 			return (null);
 		}
-		return (new URLService(name, group, url, interval, warning, error));
+		return (new URLService(name, group, url, expectedResponseCode, interval, warning, error));
 	}
 	
 	public interface Callback {
@@ -168,6 +182,12 @@ public class URLServiceDialog extends JDialog implements ActionListener {
 		
 		url = new JTextField("http://", 24);
 		panel.add(url);
+		
+		JLabel expectedResponseCodeLabel = new JLabel("* Expected response code (HTTP status)");
+		panel.add(expectedResponseCodeLabel);
+		
+		expectedResponseCode = new JTextField("200", 24);
+		panel.add(expectedResponseCode);
 		
 		JLabel intervalLabel = new JLabel("* Interval (ms)");
 		panel.add(intervalLabel);
@@ -207,11 +227,17 @@ public class URLServiceDialog extends JDialog implements ActionListener {
 		sl.putConstraint(SpringLayout.EAST, url, -10, SpringLayout.EAST, panel);
 		sl.putConstraint(SpringLayout.NORTH, url, 10, SpringLayout.SOUTH, group);
 		
+		sl.putConstraint(SpringLayout.WEST, expectedResponseCodeLabel, 10, SpringLayout.WEST, panel);
+		sl.putConstraint(SpringLayout.NORTH, expectedResponseCodeLabel, 10, SpringLayout.SOUTH, url);
+		
+		sl.putConstraint(SpringLayout.EAST, expectedResponseCode, -10, SpringLayout.EAST, panel);
+		sl.putConstraint(SpringLayout.NORTH, expectedResponseCode, 10, SpringLayout.SOUTH, url);
+		
 		sl.putConstraint(SpringLayout.WEST, intervalLabel, 10, SpringLayout.WEST, panel);
-		sl.putConstraint(SpringLayout.NORTH, intervalLabel, 10, SpringLayout.SOUTH, url);
+		sl.putConstraint(SpringLayout.NORTH, intervalLabel, 10, SpringLayout.SOUTH, expectedResponseCode);
 		
 		sl.putConstraint(SpringLayout.EAST, interval, -10, SpringLayout.EAST, panel);
-		sl.putConstraint(SpringLayout.NORTH, interval, 10, SpringLayout.SOUTH, url);
+		sl.putConstraint(SpringLayout.NORTH, interval, 10, SpringLayout.SOUTH, expectedResponseCode);
 		
 		sl.putConstraint(SpringLayout.WEST, warningLabel, 10, SpringLayout.WEST, panel);
 		sl.putConstraint(SpringLayout.NORTH, warningLabel, 10, SpringLayout.SOUTH, interval);

@@ -16,7 +16,9 @@ public class URLService extends Service {
 	
 	private String url;
 	
-	public URLService(String name, String group, String url, long interval, long warning, long error) {
+	private int expectedResponseCode;
+	
+	public URLService(String name, String group, String url, int expectedResponseCode, long interval, long warning, long error) {
 		logger.i("init");
 		super.setId(UUID.randomUUID().toString());
 		super.setName(name);
@@ -25,6 +27,7 @@ public class URLService extends Service {
 		super.setWarning(warning);
 		super.setError(error);
 		this.url = url;
+		this.expectedResponseCode = expectedResponseCode;
 	}
 
 	@Override
@@ -58,7 +61,7 @@ public class URLService extends Service {
 			connection.setDoOutput(false);
 			int responseCode = connection.getResponseCode();
 			logger.i("server responded with code " + responseCode);
-			if (responseCode == 200) {
+			if (responseCode == expectedResponseCode) {
 				response.setStatus(Response.STATUS_OK);
 			} else {
 				response.setStatus(Response.STATUS_ERROR);
