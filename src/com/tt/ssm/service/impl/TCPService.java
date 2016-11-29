@@ -4,6 +4,7 @@ import java.net.Socket;
 import java.util.Date;
 import java.util.UUID;
 
+import com.google.gson.Gson;
 import com.tt.ssm.misc.Logger;
 import com.tt.ssm.service.Response;
 import com.tt.ssm.service.Service;
@@ -19,6 +20,7 @@ public class TCPService extends Service {
 	public TCPService(String name, String group, String host, int port, long interval, long warning, long error) {
 		logger.i("init");
 		super.setId(UUID.randomUUID().toString());
+		super.setType(TYPE_TCP);
 		super.setName(name);
 		super.setGroup(group);
 		super.setInterval(interval);
@@ -29,8 +31,9 @@ public class TCPService extends Service {
 	}
 
 	@Override
-	public String getType() {
-		return ("TCP");
+	public String toString() {
+		Gson gson = new Gson();
+		return (gson.toJson(this));
 	}
 	
 	@Override

@@ -3,6 +3,8 @@ package com.tt.ssm.service;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import com.google.gson.Gson;
+
 public class Response {
 
 	public static final int STATUS_OK = 0;
@@ -24,15 +26,8 @@ public class Response {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("{ \"status\": \"");
-		sb.append(formatStatus(status));
-		sb.append("\", \"time\": ");
-		sb.append(time);
-		sb.append(", \"message\": \"");
-		sb.append(message);
-		sb.append("\" }");
-		return (sb.toString());
+		Gson gson = new Gson();
+		return (gson.toJson(this));
 	}
 
 	public static String formatStatus(int status) {

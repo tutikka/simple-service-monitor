@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.Date;
 import java.util.UUID;
 
+import com.google.gson.Gson;
 import com.tt.ssm.misc.Constants;
 import com.tt.ssm.misc.Logger;
 import com.tt.ssm.service.Response;
@@ -21,6 +22,7 @@ public class URLService extends Service {
 	public URLService(String name, String group, String url, int expectedResponseCode, long interval, long warning, long error) {
 		logger.i("init");
 		super.setId(UUID.randomUUID().toString());
+		super.setType(TYPE_URL);
 		super.setName(name);
 		super.setGroup(group);
 		super.setInterval(interval);
@@ -31,8 +33,9 @@ public class URLService extends Service {
 	}
 
 	@Override
-	public String getType() {
-		return ("URL");
+	public String toString() {
+		Gson gson = new Gson();
+		return (gson.toJson(this));
 	}
 	
 	@Override

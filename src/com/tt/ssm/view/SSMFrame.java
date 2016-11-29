@@ -16,6 +16,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -94,16 +95,27 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 			});
 			
 		}
+		if ("save".equals(e.getActionCommand())) {
+			EventQueue.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					handleSave();
+				}
+			});
+		}
+		if ("open".equals(e.getActionCommand())) {
+			EventQueue.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					handleOpen();
+				}
+			});
+		}
 		if ("exit".equals(e.getActionCommand())) {
 			EventQueue.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					int result = JOptionPane.showConfirmDialog(SSMFrame.this, "Are you sure?", "Exit", JOptionPane.YES_NO_OPTION);
-					if (result == JOptionPane.YES_OPTION) {
-						ServiceManager.getInstance().unregisterCallback(SSMFrame.this);
-						ServiceManager.getInstance().close();
-						dispose();
-					}
+					handleExit();
 				}
 			});
 
@@ -127,7 +139,7 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 			});
 
 		}
-		if ("open".equals(e.getActionCommand())) {
+		if ("details".equals(e.getActionCommand())) {
 			final int tableRow = table.getSelectedRow();
 			if (tableRow == -1) {
 				return;
@@ -148,7 +160,7 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 			});
 
 		}
-		if ("start".equals(e.getActionCommand())) {
+		if ("cancel".equals(e.getActionCommand())) {
 			final int tableRow = table.getSelectedRow();
 			if (tableRow == -1) {
 				return;
@@ -160,50 +172,61 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 			EventQueue.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					Service service = ctm.getService(modelRow);
-					ServiceManager.getInstance().schedule(service);
-				}
-			});
-		}
-		if ("stop".equals(e.getActionCommand())) {
-			final int tableRow = table.getSelectedRow();
-			if (tableRow == -1) {
-				return;
-			}
-			final int modelRow = table.convertRowIndexToModel(tableRow);
-			if (modelRow == -1) {
-				return;
-			}
-			EventQueue.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					Service service = ctm.getService(modelRow);
-					ServiceManager.getInstance().cancel(service);
-				}
-			});
-
-		}
-		if ("delete".equals(e.getActionCommand())) {
-			final int tableRow = table.getSelectedRow();
-			if (tableRow == -1) {
-				return;
-			}
-			final int modelRow = table.convertRowIndexToModel(tableRow);
-			if (modelRow == -1) {
-				return;
-			}
-			EventQueue.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					int result = JOptionPane.showConfirmDialog(SSMFrame.this, "Are you sure?", "Delete", JOptionPane.YES_NO_OPTION);
+					int result = JOptionPane.showConfirmDialog(SSMFrame.this, "Are you sure?", "Cancel", JOptionPane.YES_NO_OPTION);
 					if (result == JOptionPane.YES_OPTION) {
 						Service service = ctm.getService(modelRow);
 						ServiceManager.getInstance().cancel(service);
-						ctm.remove(service);
 					}
 				}
 			});
 
+		}
+	}
+	
+	private void handleSave() {
+		JFileChooser chooser = new JFileChooser();
+		int result = chooser.showSaveDialog(SSMFrame.this);
+		if (result == JFileChooser.APPROVE_OPTION) {
+			if (chooser.getSelectedFile().exists()) {
+				result = JOptionPane.showConfirmDialog(SSMFrame.this, "The selected file already exists and will be overwritten. Are you sure?", "Save", JOptionPane.YES_NO_OPTION);
+				if (result == JOptionPane.YES_OPTION) {
+					ServiceManager.getInstance().save(chooser.getSelectedFile());
+				}
+			} else {
+				ServiceManager.getInstance().save(chooser.getSelectedFile());
+			}
+		}
+	}
+	
+	private void handleOpen() {
+		if (ServiceManager.getInstance().list().size() > 0) {
+			int result = JOptionPane.showConfirmDialog(SSMFrame.this, "All current services will be cancelled. Are you sure?", "Open", JOptionPane.YES_NO_OPTION);
+			if (result == JOptionPane.YES_OPTION) {
+				JFileChooser chooser = new JFileChooser();
+				result = chooser.showOpenDialog(SSMFrame.this);
+				if (result == JFileChooser.APPROVE_OPTION) {
+					ServiceManager.getInstance().open(chooser.getSelectedFile());
+				}
+			}
+		} else {
+			JFileChooser chooser = new JFileChooser();
+			int result = chooser.showOpenDialog(SSMFrame.this);
+			if (result == JFileChooser.APPROVE_OPTION) {
+				ServiceManager.getInstance().open(chooser.getSelectedFile());
+			}
+		}
+	}
+	
+	private void handleExit() {
+		if (ServiceManager.getInstance().list().size() > 0) {
+			int result = JOptionPane.showConfirmDialog(SSMFrame.this, "All current services will be cancelled. Are you sure?", "Exit", JOptionPane.YES_NO_OPTION);
+			if (result == JOptionPane.YES_OPTION) {
+				ServiceManager.getInstance().unregisterCallback(SSMFrame.this);
+				ServiceManager.getInstance().close();
+				dispose();
+			}
+		} else {
+			dispose();
 		}
 	}
 	
@@ -253,7 +276,6 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				ctm.update(service);
 				ServiceManager.getInstance().schedule(service);
 			}
 		});
@@ -265,7 +287,6 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				ctm.update(service);
 				ServiceManager.getInstance().schedule(service);
 			}
 		});
@@ -277,7 +298,6 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				ctm.update(service);
 				ServiceManager.getInstance().schedule(service);
 			}
 		});
@@ -292,9 +312,28 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 				ctm.update(service);
 			}
 		});
-		
 	}
 	
+	@Override
+	public void onServiceScheduled(final Service service) {
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				ctm.add(service);
+			}
+		});
+	}
+
+	@Override
+	public void onServiceCancelled(final Service service) {
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				ctm.remove(service);
+			}
+		});
+	}
+
 	private void applyFilter(String filter, int column) {
         RowFilter<CustomTableModel, Object> rf = null;
         try {
@@ -360,24 +399,15 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 		table.setRowSorter(trs);
 		table.setFillsViewportHeight(true);
 	    JPopupMenu popupMenu = new JPopupMenu();
-	    JMenuItem open = new JMenuItem("Open");
-	    open.setActionCommand("open");
-	    open.addActionListener(this);
-	    JMenuItem start = new JMenuItem("Start");
-	    start.setActionCommand("start");
-	    start.addActionListener(this);
-	    JMenuItem stop = new JMenuItem("Stop");
-	    stop.setActionCommand("stop");
-	    stop.addActionListener(this);
-	    JMenuItem delete = new JMenuItem("Delete");
-	    delete.setActionCommand("delete");
-	    delete.addActionListener(this);
-	    popupMenu.add(open);
+	    JMenuItem details = new JMenuItem("Details");
+	    details.setActionCommand("details");
+	    details.addActionListener(this);
+	    JMenuItem cancel = new JMenuItem("Cancel");
+	    cancel.setActionCommand("cancel");
+	    cancel.addActionListener(this);
+	    popupMenu.add(details);
 	    popupMenu.addSeparator();
-	    popupMenu.add(start);
-	    popupMenu.add(stop);
-	    popupMenu.addSeparator();
-	    popupMenu.add(delete);
+	    popupMenu.add(cancel);
 	    table.setComponentPopupMenu(popupMenu);
 		JScrollPane jsp = new JScrollPane(table);
 		JPanel panel = new JPanel();
@@ -390,7 +420,7 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 	private JMenuBar createMenuBar() {
 		JMenuBar menuBar = new JMenuBar();
 		JMenu file = new JMenu("File");
-		JMenuItem addService = new JMenu("Add service...");
+		JMenuItem addService = new JMenu("Add service");
 		JMenuItem jdbcService = new JMenuItem("JDBC service");
 		jdbcService.setActionCommand("jdbcService");
 		jdbcService.addActionListener(this);
@@ -404,6 +434,15 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 		urlService.addActionListener(this);
 		addService.add(urlService);
 		file.add(addService);
+		file.addSeparator();
+		JMenuItem open = new JMenuItem("Open...");
+		open.setActionCommand("open");
+		open.addActionListener(this);
+		file.add(open);
+		JMenuItem save = new JMenuItem("Save...");
+		save.setActionCommand("save");
+		save.addActionListener(this);
+		file.add(save);
 		file.addSeparator();
 		JMenuItem exit = new JMenuItem("Exit");
 		exit.setActionCommand("exit");

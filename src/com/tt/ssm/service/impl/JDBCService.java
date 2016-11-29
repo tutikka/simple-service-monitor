@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.util.Date;
 import java.util.UUID;
 
+import com.google.gson.Gson;
 import com.tt.ssm.misc.Logger;
 import com.tt.ssm.service.Response;
 import com.tt.ssm.service.Service;
@@ -28,6 +29,7 @@ public class JDBCService extends Service {
 	public JDBCService(String name, String group, String driver, String url, String username, char[] password, String query, long interval, long warning, long error) {
 		logger.i("init");
 		super.setId(UUID.randomUUID().toString());
+		super.setType(TYPE_JDBC);
 		super.setName(name);
 		super.setGroup(group);
 		super.setInterval(interval);
@@ -41,8 +43,9 @@ public class JDBCService extends Service {
 	}
 
 	@Override
-	public String getType() {
-		return ("JDBC");
+	public String toString() {
+		Gson gson = new Gson();
+		return (gson.toJson(this));
 	}
 	
 	@Override

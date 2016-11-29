@@ -2,9 +2,17 @@ package com.tt.ssm.service;
 
 public abstract class Service implements Comparable<Service> {
 	
+	public static final String TYPE_URL = "url";
+	
+	public static final String TYPE_TCP = "tcp";
+	
+	public static final String TYPE_JDBC = "jdbc";
+	
 	private String id;
 	
 	private String name;
+	
+	private String type;
 	
 	private String group;
 	
@@ -18,15 +26,13 @@ public abstract class Service implements Comparable<Service> {
 	
 	public abstract void request();
 	
-	public abstract String getType();
-	
 	public abstract String getDestination();
 	
 	@Override
 	public int compareTo(Service o) {
 		return (this.id.compareTo(o.id));
 	}
-	
+
 	public String getId() {
 		return id;
 	}
@@ -41,6 +47,14 @@ public abstract class Service implements Comparable<Service> {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 
 	public String getGroup() {

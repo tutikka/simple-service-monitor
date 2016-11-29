@@ -15,15 +15,18 @@ public class CustomTableModel extends AbstractTableModel {
 
 	private List<Service> services = new ArrayList<Service>();
 	
+	public void add(Service service) {
+		services.add(service);
+		fireTableRowsInserted(services.size() - 1, services.size() - 1);
+	}
+	
 	public void update(Service service) {
-		if (services.contains(service)) {
-			int index = services.indexOf(service);
-			Service existing = services.get(index);
-			existing.setResponse(service.getResponse());
-			fireTableRowsUpdated(index, index);
+		int row = services.indexOf(service);
+		if (row < 0 || row > services.size() - 1) {
 		} else {
-			services.add(service);
-			fireTableRowsInserted(services.size() - 1, services.size() - 1);
+			Service existing = services.get(row);
+			existing.setResponse(service.getResponse());
+			fireTableRowsUpdated(row, row);
 		}
 	}
 	
@@ -76,16 +79,16 @@ public class CustomTableModel extends AbstractTableModel {
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		Service service = services.get(rowIndex);
-		if (service != null && service.getResponse() != null) {
+		if (service != null) {
 			switch (columnIndex) {
 			case 0 : return (service.getName());
 			case 1 : return (service.getGroup());
 			case 2 : return (service.getType());
 			case 3 : return (service.getDestination());
-			case 4 : return (Response.formatStatus(service.getResponse().getStatus()));
-			case 5 : return (service.getResponse().getTime());
-			case 6 : return (service.getResponse().getMessage());
-			case 7 : return (Response.formatUpdated(service.getResponse().getUpdated()));
+			case 4 : return (service.getResponse() == null ? null : Response.formatStatus(service.getResponse().getStatus()));
+			case 5 : return (service.getResponse() == null ? null : service.getResponse().getTime());
+			case 6 : return (service.getResponse() == null ? null : service.getResponse().getMessage());
+			case 7 : return (service.getResponse() == null ? null : Response.formatUpdated(service.getResponse().getUpdated()));
 			default : return (null);
 			}
 		} else {

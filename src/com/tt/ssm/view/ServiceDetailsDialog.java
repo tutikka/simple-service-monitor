@@ -81,6 +81,14 @@ public class ServiceDetailsDialog extends JDialog implements ActionListener, Cal
 		}
 	}
 
+	@Override
+	public void onServiceScheduled(Service service) {
+	}
+
+	@Override
+	public void onServiceCancelled(Service service) {
+	}
+
 	private JPanel createContentPanel() {
 		series = new TimeSeries("Time");
 		TimeSeriesCollection collection = new TimeSeriesCollection(series);
