@@ -1,6 +1,7 @@
 package com.tt.ssm.view;
 
 import java.awt.BorderLayout;
+import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -70,10 +71,15 @@ public class TCPServiceDialog extends JDialog implements ActionListener {
 			dispose();
 		}
 		if ("test".equals(e.getActionCommand())) {
-			TCPService service = getService();
+			final TCPService service = getService();
 			if (service != null) {
-				service.request();
-				JOptionPane.showMessageDialog(this, service.getResponse(), "Test", JOptionPane.INFORMATION_MESSAGE);
+				EventQueue.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						service.request();
+						JOptionPane.showMessageDialog(TCPServiceDialog.this, service.getResponse(), "Test", JOptionPane.INFORMATION_MESSAGE);
+					}
+				});
 			}
 		}
 		if ("ok".equals(e.getActionCommand())) {
