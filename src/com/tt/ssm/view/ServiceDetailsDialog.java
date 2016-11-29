@@ -1,5 +1,6 @@
 package com.tt.ssm.view;
 
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -103,6 +104,9 @@ public class ServiceDetailsDialog extends JDialog implements ActionListener, Cal
 		chart.setAntiAlias(true);
 		chart.setBackgroundPaint(new Color(0, 0, 0, 0));
 	    XYPlot plot = chart.getXYPlot();
+	    plot.setBackgroundPaint(new Color(32, 32, 32, 255));
+	    plot.getRenderer().setSeriesPaint(0, new Color(32, 255, 32, 255));
+	    plot.getRenderer().setSeriesStroke(0, new BasicStroke(3.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 	    ValueAxis domain = plot.getDomainAxis();
 	    domain.setAutoRange(true);
 	    domain.setFixedAutoRange(60 * 1000); // 60 seconds
