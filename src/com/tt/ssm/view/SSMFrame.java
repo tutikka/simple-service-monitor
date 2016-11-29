@@ -226,6 +226,8 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 				dispose();
 			}
 		} else {
+			ServiceManager.getInstance().unregisterCallback(SSMFrame.this);
+			ServiceManager.getInstance().close();
 			dispose();
 		}
 	}
