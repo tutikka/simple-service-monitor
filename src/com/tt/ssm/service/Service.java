@@ -8,6 +8,8 @@ public abstract class Service implements Comparable<Service> {
 	
 	public static final String TYPE_JDBC = "jdbc";
 	
+	public static final String TYPE_ICMP = "icmp";
+	
 	private String id;
 	
 	private String name;

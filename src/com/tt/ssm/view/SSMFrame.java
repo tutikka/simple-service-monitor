@@ -39,12 +39,13 @@ import com.tt.ssm.misc.Constants;
 import com.tt.ssm.misc.Utils;
 import com.tt.ssm.service.Service;
 import com.tt.ssm.service.ServiceManager;
+import com.tt.ssm.service.impl.ICMPService;
 import com.tt.ssm.service.impl.JDBCService;
 import com.tt.ssm.service.impl.TCPService;
 import com.tt.ssm.service.impl.URLService;
 
 @SuppressWarnings("serial")
-public class SSMFrame extends JFrame implements ActionListener, MouseListener, URLServiceDialog.Callback, TCPServiceDialog.Callback, JDBCServiceDialog.Callback, ServiceManager.Callback {
+public class SSMFrame extends JFrame implements ActionListener, MouseListener, URLServiceDialog.Callback, TCPServiceDialog.Callback, JDBCServiceDialog.Callback, ICMPServiceDialog.Callback, ServiceManager.Callback {
 	
 	private CustomTableModel ctm = new CustomTableModel();
 	
@@ -91,6 +92,15 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 				@Override
 				public void run() {
 					new URLServiceDialog(SSMFrame.this, SSMFrame.this).setVisible(true);
+				}
+			});
+			
+		}
+		if ("icmpService".equals(e.getActionCommand())) {
+			EventQueue.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					new ICMPServiceDialog(SSMFrame.this, SSMFrame.this).setVisible(true);
 				}
 			});
 			
@@ -257,6 +267,17 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 
 	}
 
+	@Override
+	public void onICMPServiceAdded(final ICMPService service) {
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				ServiceManager.getInstance().schedule(service);
+			}
+		});
+
+	}
+	
 	@Override
 	public void onServiceResponded(final Service service) {
 		EventQueue.invokeLater(new Runnable() {
@@ -437,6 +458,10 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 		urlService.setActionCommand("urlService");
 		urlService.addActionListener(this);
 		addService.add(urlService);
+		JMenuItem icmpService = new JMenuItem("ICMP service");
+		icmpService.setActionCommand("icmpService");
+		icmpService.addActionListener(this);
+		addService.add(icmpService);
 		file.add(addService);
 		file.addSeparator();
 		JMenuItem open = new JMenuItem("Open...");
