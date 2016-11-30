@@ -121,6 +121,14 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 				}
 			});
 		}
+		if ("import".equals(e.getActionCommand())) {
+			EventQueue.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					handleImport();
+				}
+			});
+		}
 		if ("exit".equals(e.getActionCommand())) {
 			EventQueue.invokeLater(new Runnable() {
 				@Override
@@ -385,6 +393,7 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 		if (ServiceManager.getInstance().list().size() > 0) {
 			int result = JOptionPane.showConfirmDialog(SSMFrame.this, "All current services will be cancelled. Are you sure?", "Open", JOptionPane.YES_NO_OPTION);
 			if (result == JOptionPane.YES_OPTION) {
+				ServiceManager.getInstance().cancel();
 				JFileChooser chooser = new JFileChooser();
 				result = chooser.showOpenDialog(SSMFrame.this);
 				if (result == JFileChooser.APPROVE_OPTION) {
@@ -400,10 +409,19 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 		}
 	}
 	
+	private void handleImport() {
+		JFileChooser chooser = new JFileChooser();
+		int result = chooser.showOpenDialog(SSMFrame.this);
+		if (result == JFileChooser.APPROVE_OPTION) {
+			ServiceManager.getInstance().open(chooser.getSelectedFile());
+		}
+	}
+	
 	private void handleExit() {
 		if (ServiceManager.getInstance().list().size() > 0) {
 			int result = JOptionPane.showConfirmDialog(SSMFrame.this, "All current services will be cancelled. Are you sure?", "Exit", JOptionPane.YES_NO_OPTION);
 			if (result == JOptionPane.YES_OPTION) {
+				ServiceManager.getInstance().cancel();
 				ServiceManager.getInstance().unregisterCallback(SSMFrame.this);
 				ServiceManager.getInstance().close();
 				dispose();
@@ -472,6 +490,11 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 		save.setActionCommand("save");
 		save.addActionListener(this);
 		file.add(save);
+		file.addSeparator();
+		JMenuItem _import = new JMenuItem("Import...");
+		_import.setActionCommand("import");
+		_import.addActionListener(this);
+		file.add(_import);
 		file.addSeparator();
 		JMenuItem exit = new JMenuItem("Exit");
 		exit.setActionCommand("exit");

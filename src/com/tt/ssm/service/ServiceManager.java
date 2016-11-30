@@ -83,6 +83,21 @@ public class ServiceManager {
 		logger.i("schedule completed");
 	}
 	
+	public void cancel() {
+		logger.i("cancel");
+		for (Iterator<FutureWrapper> iterator = futures.iterator(); iterator.hasNext(); ) {
+			FutureWrapper wrapper = iterator.next();
+			logger.i("cancelling service " + wrapper.getService());
+			wrapper.getFuture().cancel(false);
+			iterator.remove();
+			for (Callback callback : callbacks) {
+				callback.onServiceCancelled(wrapper.getService());
+			}
+			logger.i("service cancelled");
+		}
+		logger.i("cancel completed");
+	}
+	
 	public void cancel(Service service) {
 		logger.i("cancel");
 		for (Iterator<FutureWrapper> iterator = futures.iterator(); iterator.hasNext(); ) {
@@ -151,16 +166,6 @@ public class ServiceManager {
 	
 	public void close() {
 		logger.i("close");
-		for (Iterator<FutureWrapper> iterator = futures.iterator(); iterator.hasNext(); ) {
-			FutureWrapper wrapper = iterator.next();
-			logger.i("cancelling service " + wrapper.getService());
-			wrapper.getFuture().cancel(false);
-			iterator.remove();
-			for (Callback callback : callbacks) {
-				callback.onServiceCancelled(wrapper.getService());
-			}
-			logger.i("service cancelled");
-		}
 		ses.shutdown();
 		logger.i("close completed");
 	}
