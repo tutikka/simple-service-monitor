@@ -19,7 +19,7 @@ Available service types:
 Instructions
 ------------
 
-*Build from source (Unix, Linux, MacOS)*
+*Build latest version from source (Unix, Linux, MacOS)*
 
 ```
 $ git clone https://github.com/tutikka/simple-service-monitor.git
@@ -39,6 +39,13 @@ Add the following as a VM argument to `ssm.sh` or `ssm.cmd`:
 
 Note that you can see all the installed look and feel class names for your system in the logs after startup.
 
+*Use the screen menu bar on Mac OS*
+
+Add the following VM argument to `ssm.sh`:
+
+```
+-Dapple.laf.useScreenMenuBar=true
+```
 
 Screenshots
 -----------
