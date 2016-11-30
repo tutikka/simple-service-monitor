@@ -98,6 +98,14 @@ public class JDBCServiceDialog extends JDialog implements ActionListener {
 		}
 	}
 	
+	public interface Callback {
+		
+		public void onJDBCServiceAdded(JDBCService service);
+		
+	}
+	
+	/* ********** private ********** */
+	
 	private JDBCService getService() {
 		// name
 		String name = this.name.getText();
@@ -175,12 +183,6 @@ public class JDBCServiceDialog extends JDialog implements ActionListener {
 			return (null);
 		}
 		return (new JDBCService(name, group, driver, url, username, password, query, interval, warning, error));
-	}
-	
-	public interface Callback {
-		
-		public void onJDBCServiceAdded(JDBCService service);
-		
 	}
 	
 	private JPanel createContentPanel() {

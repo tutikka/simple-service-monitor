@@ -172,7 +172,7 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 			EventQueue.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					int result = JOptionPane.showConfirmDialog(SSMFrame.this, "Are you sure?", "Cancel", JOptionPane.YES_NO_OPTION);
+					int result = JOptionPane.showConfirmDialog(SSMFrame.this, "The service will be cancelled and removed from the list. Are you sure?", "Cancel", JOptionPane.YES_NO_OPTION);
 					if (result == JOptionPane.YES_OPTION) {
 						Service service = ctm.getService(modelRow);
 						ServiceManager.getInstance().cancel(service);
@@ -180,55 +180,6 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 				}
 			});
 
-		}
-	}
-	
-	private void handleSave() {
-		JFileChooser chooser = new JFileChooser();
-		int result = chooser.showSaveDialog(SSMFrame.this);
-		if (result == JFileChooser.APPROVE_OPTION) {
-			if (chooser.getSelectedFile().exists()) {
-				result = JOptionPane.showConfirmDialog(SSMFrame.this, "The selected file already exists and will be overwritten. Are you sure?", "Save", JOptionPane.YES_NO_OPTION);
-				if (result == JOptionPane.YES_OPTION) {
-					ServiceManager.getInstance().save(chooser.getSelectedFile());
-				}
-			} else {
-				ServiceManager.getInstance().save(chooser.getSelectedFile());
-			}
-		}
-	}
-	
-	private void handleOpen() {
-		if (ServiceManager.getInstance().list().size() > 0) {
-			int result = JOptionPane.showConfirmDialog(SSMFrame.this, "All current services will be cancelled. Are you sure?", "Open", JOptionPane.YES_NO_OPTION);
-			if (result == JOptionPane.YES_OPTION) {
-				JFileChooser chooser = new JFileChooser();
-				result = chooser.showOpenDialog(SSMFrame.this);
-				if (result == JFileChooser.APPROVE_OPTION) {
-					ServiceManager.getInstance().open(chooser.getSelectedFile());
-				}
-			}
-		} else {
-			JFileChooser chooser = new JFileChooser();
-			int result = chooser.showOpenDialog(SSMFrame.this);
-			if (result == JFileChooser.APPROVE_OPTION) {
-				ServiceManager.getInstance().open(chooser.getSelectedFile());
-			}
-		}
-	}
-	
-	private void handleExit() {
-		if (ServiceManager.getInstance().list().size() > 0) {
-			int result = JOptionPane.showConfirmDialog(SSMFrame.this, "All current services will be cancelled. Are you sure?", "Exit", JOptionPane.YES_NO_OPTION);
-			if (result == JOptionPane.YES_OPTION) {
-				ServiceManager.getInstance().unregisterCallback(SSMFrame.this);
-				ServiceManager.getInstance().close();
-				dispose();
-			}
-		} else {
-			ServiceManager.getInstance().unregisterCallback(SSMFrame.this);
-			ServiceManager.getInstance().close();
-			dispose();
 		}
 	}
 	
@@ -390,6 +341,57 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 		panel.add(clear);
 		filter.setPreferredSize(clear.getPreferredSize());
 		return (panel);
+	}
+	
+	/* ********** private ********** */
+	
+	private void handleSave() {
+		JFileChooser chooser = new JFileChooser();
+		int result = chooser.showSaveDialog(SSMFrame.this);
+		if (result == JFileChooser.APPROVE_OPTION) {
+			if (chooser.getSelectedFile().exists()) {
+				result = JOptionPane.showConfirmDialog(SSMFrame.this, "The selected file already exists and will be overwritten. Are you sure?", "Save", JOptionPane.YES_NO_OPTION);
+				if (result == JOptionPane.YES_OPTION) {
+					ServiceManager.getInstance().save(chooser.getSelectedFile());
+				}
+			} else {
+				ServiceManager.getInstance().save(chooser.getSelectedFile());
+			}
+		}
+	}
+	
+	private void handleOpen() {
+		if (ServiceManager.getInstance().list().size() > 0) {
+			int result = JOptionPane.showConfirmDialog(SSMFrame.this, "All current services will be cancelled. Are you sure?", "Open", JOptionPane.YES_NO_OPTION);
+			if (result == JOptionPane.YES_OPTION) {
+				JFileChooser chooser = new JFileChooser();
+				result = chooser.showOpenDialog(SSMFrame.this);
+				if (result == JFileChooser.APPROVE_OPTION) {
+					ServiceManager.getInstance().open(chooser.getSelectedFile());
+				}
+			}
+		} else {
+			JFileChooser chooser = new JFileChooser();
+			int result = chooser.showOpenDialog(SSMFrame.this);
+			if (result == JFileChooser.APPROVE_OPTION) {
+				ServiceManager.getInstance().open(chooser.getSelectedFile());
+			}
+		}
+	}
+	
+	private void handleExit() {
+		if (ServiceManager.getInstance().list().size() > 0) {
+			int result = JOptionPane.showConfirmDialog(SSMFrame.this, "All current services will be cancelled. Are you sure?", "Exit", JOptionPane.YES_NO_OPTION);
+			if (result == JOptionPane.YES_OPTION) {
+				ServiceManager.getInstance().unregisterCallback(SSMFrame.this);
+				ServiceManager.getInstance().close();
+				dispose();
+			}
+		} else {
+			ServiceManager.getInstance().unregisterCallback(SSMFrame.this);
+			ServiceManager.getInstance().close();
+			dispose();
+		}
 	}
 	
 	private JComponent createContent() {

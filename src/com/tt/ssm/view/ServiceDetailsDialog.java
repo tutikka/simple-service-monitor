@@ -90,6 +90,8 @@ public class ServiceDetailsDialog extends JDialog implements ActionListener, Cal
 	public void onServiceCancelled(Service service) {
 	}
 
+	/* ********** private ********** */
+	
 	private JPanel createContentPanel() {
 		series = new TimeSeries("Time");
 		TimeSeriesCollection collection = new TimeSeriesCollection(series);

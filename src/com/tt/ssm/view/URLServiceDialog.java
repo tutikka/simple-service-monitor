@@ -91,6 +91,14 @@ public class URLServiceDialog extends JDialog implements ActionListener {
 		}
 	}
 	
+	public interface Callback {
+		
+		public void onURLServiceAdded(URLService service);
+		
+	}
+	
+	/* ********** private ********** */
+	
 	private URLService getService() {
 		// name
 		String name = this.name.getText();
@@ -158,12 +166,6 @@ public class URLServiceDialog extends JDialog implements ActionListener {
 			return (null);
 		}
 		return (new URLService(name, group, url, expectedResponseCode, interval, warning, error));
-	}
-	
-	public interface Callback {
-		
-		public void onURLServiceAdded(URLService service);
-		
 	}
 	
 	private JPanel createContentPanel() {

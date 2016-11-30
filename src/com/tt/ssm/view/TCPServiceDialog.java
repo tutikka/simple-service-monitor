@@ -91,6 +91,14 @@ public class TCPServiceDialog extends JDialog implements ActionListener {
 		}
 	}
 	
+	public interface Callback {
+		
+		public void onTCPServiceAdded(TCPService service);
+		
+	}
+	
+	/* ********** private ********** */
+	
 	private TCPService getService() {
 		// name
 		String name = this.name.getText();
@@ -158,12 +166,6 @@ public class TCPServiceDialog extends JDialog implements ActionListener {
 			return (null);
 		}
 		return (new TCPService(name, group, host, port, interval, warning, error));
-	}
-	
-	public interface Callback {
-		
-		public void onTCPServiceAdded(TCPService service);
-		
 	}
 	
 	private JPanel createContentPanel() {
