@@ -15,6 +15,7 @@ Available service types:
 - URL service: monitor a URL using HTTP
 - JDBC service: monitor a database using JDBC (be sure to include JDBC driver)
 - TCP service: monitor a custom host and port using TCP
+- ICMP service: ping a host using an ICMP ECHO REQUEST
 
 Instructions
 ------------

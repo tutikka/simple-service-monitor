@@ -20,6 +20,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.tt.ssm.misc.Logger;
+import com.tt.ssm.service.impl.ICMPService;
 import com.tt.ssm.service.impl.JDBCService;
 import com.tt.ssm.service.impl.TCPService;
 import com.tt.ssm.service.impl.URLService;
@@ -190,6 +191,10 @@ public class ServiceManager {
 	        }
 	        if (Service.TYPE_JDBC.equals(t)) {
 		        Service service = jsonDeserializationContext.deserialize(jsonElement, JDBCService.class);
+		        return (service);
+	        }
+	        if (Service.TYPE_ICMP.equals(t)) {
+		        Service service = jsonDeserializationContext.deserialize(jsonElement, ICMPService.class);
 		        return (service);
 	        }
 	        return (null);
