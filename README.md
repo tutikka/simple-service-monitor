@@ -16,9 +16,33 @@ Available service types:
 - JDBC service: monitor a database using JDBC (be sure to include JDBC driver)
 - TCP service: monitor a custom host and port using TCP
 
+Instructions
+------------
+
+*Build from source (Unix, Linux, MacOS)*
+
+```
+$ git clone https://github.com/tutikka/simple-service-monitor.git
+$ cd simple-service-monitor
+$ ant
+$ cd dist
+$ sh ./ssm.sh &
+```
+
+*Customizing look and feel*
+
+Add the following as a VM argument to `ssm.sh` or `ssm.cmd`: 
+
+```
+-Dssm.laf.class=javax.swing.plaf.nimbus.NimbusLookAndFeel
+```
+
+Note that you can see all the installed look and feel class names for your system in the logs after startup.
+
+
 Screenshots
 -----------
 
-![ScreenShot](/etc/services.png)
+![ScreenShot](/screenshots/services.png)
 
-![ScreenShot](/etc/service_details.png)
+![ScreenShot](/screenshots/service_details.png)
