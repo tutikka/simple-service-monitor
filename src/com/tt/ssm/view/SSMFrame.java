@@ -441,6 +441,7 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 		table.addMouseListener(this);
 		table.setRowSorter(trs);
 		table.setFillsViewportHeight(true);
+		table.getTableHeader().setReorderingAllowed(false);
 	    JPopupMenu popupMenu = new JPopupMenu();
 	    JMenuItem details = new JMenuItem("Details");
 	    details.setActionCommand("details");
