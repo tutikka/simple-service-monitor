@@ -36,6 +36,9 @@
   	 	</copy>  		
   	</target>
 
+  	<target name="test" depends="compile" description="test the app">
+  	</target>
+  	
   	<target name="clean" description="clean up" >
     	<delete dir="${build}"/>
     	<delete dir="${dist}"/>
