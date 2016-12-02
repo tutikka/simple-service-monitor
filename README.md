@@ -1,6 +1,11 @@
 Simple Service Monitor
 ======================
 
+Status
+------
+
+[![Build Status](https://travis-ci.org/tutikka/simple-service-monitor.svg?branch=master)](https://travis-ci.org/tutikka/simple-service-monitor)
+
 Features
 --------
 
