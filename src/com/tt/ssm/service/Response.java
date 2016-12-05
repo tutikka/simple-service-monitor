@@ -7,13 +7,13 @@ import com.google.gson.Gson;
 
 public class Response {
 
-	public static final int STATUS_OK = 0;
+	public static final String STATUS_OK = "OK";
 	
-	public static final int STATUS_WARNING = 1;
+	public static final String STATUS_WARNING = "WARNING";
 	
-	public static final int STATUS_ERROR = 2;
+	public static final String STATUS_ERROR = "ERROR";
 	
-	private int status;
+	private String status;
 	
 	private long time;
 	
@@ -29,15 +29,6 @@ public class Response {
 		Gson gson = new Gson();
 		return (gson.toJson(this));
 	}
-
-	public static String formatStatus(int status) {
-		switch (status) {
-		case STATUS_OK : return ("OK");
-		case STATUS_WARNING : return ("WARNING");
-		case STATUS_ERROR : return ("ERROR");
-		}
-		return ("");
-	}
 	
 	public static String formatUpdated(Date updated) {
 		if (updated == null) {
@@ -47,11 +38,11 @@ public class Response {
 		}
 	}
 	
-	public int getStatus() {
+	public String getStatus() {
 		return status;
 	}
 
-	public void setStatus(int status) {
+	public void setStatus(String status) {
 		this.status = status;
 	}
 

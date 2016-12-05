@@ -85,7 +85,7 @@ public class CustomTableModel extends AbstractTableModel {
 			case 1 : return (service.getGroup());
 			case 2 : return (service.getType());
 			case 3 : return (service.getDestination());
-			case 4 : return (service.getResponse() == null ? null : Response.formatStatus(service.getResponse().getStatus()));
+			case 4 : return (service.getResponse() == null ? null : service.getResponse().getStatus());
 			case 5 : return (service.getResponse() == null ? null : service.getResponse().getTime());
 			case 6 : return (service.getResponse() == null ? null : service.getResponse().getMessage());
 			case 7 : return (service.getResponse() == null ? null : Response.formatUpdated(service.getResponse().getUpdated()));
