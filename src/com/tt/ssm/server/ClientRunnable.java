@@ -7,6 +7,7 @@ import java.net.Socket;
 import java.util.List;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.tt.ssm.misc.Logger;
 import com.tt.ssm.service.Service;
 import com.tt.ssm.service.ServiceManager;
@@ -69,7 +70,7 @@ public class ClientRunnable implements Runnable {
 	
 	private void handleGetServices(OutputStream out) throws Exception {
 		List<Service> services = ServiceManager.getInstance().list();
-		Gson gson = new Gson();
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		String s = gson.toJson(services);
 		HttpResponseHead responseHead = new HttpResponseHead();
 		responseHead.setProtocol("HTTP/1.1");

@@ -134,7 +134,7 @@ public class ServiceManager {
 			services.add(wrapper.getService());
 		}
 		try {
-			Gson gson = new Gson();
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
 			FileOutputStream out = new FileOutputStream(file, false);
 			out.write(gson.toJson(services).getBytes("UTF-8"));
 			out.flush();
