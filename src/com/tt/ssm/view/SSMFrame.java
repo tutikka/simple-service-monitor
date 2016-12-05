@@ -37,6 +37,7 @@ import javax.swing.table.TableRowSorter;
 
 import com.tt.ssm.misc.Constants;
 import com.tt.ssm.misc.Utils;
+import com.tt.ssm.server.SSMHttpServer;
 import com.tt.ssm.service.Service;
 import com.tt.ssm.service.ServiceManager;
 import com.tt.ssm.service.impl.ICMPService;
@@ -45,13 +46,17 @@ import com.tt.ssm.service.impl.TCPService;
 import com.tt.ssm.service.impl.URLService;
 
 @SuppressWarnings("serial")
-public class SSMFrame extends JFrame implements ActionListener, MouseListener, URLServiceDialog.Callback, TCPServiceDialog.Callback, JDBCServiceDialog.Callback, ICMPServiceDialog.Callback, ServiceManager.Callback {
+public class SSMFrame extends JFrame implements ActionListener, MouseListener, URLServiceDialog.Callback, TCPServiceDialog.Callback, JDBCServiceDialog.Callback, ICMPServiceDialog.Callback, ServiceManager.Callback, ServerDialog.Callback {
 	
 	private CustomTableModel ctm = new CustomTableModel();
 	
 	private CustomTable table;
 	
 	private TableRowSorter<CustomTableModel> trs = new TableRowSorter<CustomTableModel>(ctm);
+	
+	private JMenuItem start;
+	
+	private JMenuItem stop;
 	
 	public SSMFrame() {
 		setTitle(Constants.TITLE);
@@ -137,6 +142,25 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 				}
 			});
 
+		}
+		if ("start".equals(e.getActionCommand())) {
+			EventQueue.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					new ServerDialog(SSMFrame.this, SSMFrame.this).setVisible(true);
+				}
+			});
+		}
+		if ("stop".equals(e.getActionCommand())) {
+			EventQueue.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					if (SSMHttpServer.getInstance().stop()) {
+						stop.setEnabled(false);
+						start.setEnabled(true);
+					}
+				}
+			});
 		}
 		if ("about".equals(e.getActionCommand())) {
 			EventQueue.invokeLater(new Runnable() {
@@ -312,6 +336,19 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 			@Override
 			public void run() {
 				ctm.remove(service);
+			}
+		});
+	}
+
+	@Override
+	public void onServerStartRequested(final String host, final int port) {
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				if (SSMHttpServer.getInstance().start(host, port)) {
+					start.setEnabled(false);
+					stop.setEnabled(true);
+				}
 			}
 		});
 	}
@@ -502,6 +539,17 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 		exit.addActionListener(this);
 		file.add(exit);
 		menuBar.add(file);
+		JMenu server = new JMenu("Server");
+		start = new JMenuItem("Start...");
+		start.setActionCommand("start");
+		start.addActionListener(this);
+		server.add(start);
+		stop = new JMenuItem("Stop");
+		stop.setEnabled(false);
+		stop.setActionCommand("stop");
+		stop.addActionListener(this);
+		server.add(stop);
+		menuBar.add(server);
 		JMenu help = new JMenu("Help");
 		JMenuItem about = new JMenuItem("About");
 		about.setActionCommand("about");
