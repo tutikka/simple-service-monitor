@@ -13,7 +13,8 @@ Simple Service Monitor is a tool to monitor your services for outages or increas
 
 - Desktop application to set up various kinds of services and provide a dashboard view
 - Graphical trend of each service
-- Save and open list of services
+- Save, open and import list of services from disk (JSON)
+- HTTP server with restful API to query services
 
 Available service types:
 
