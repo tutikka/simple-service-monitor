@@ -106,9 +106,33 @@ The built-in HTTP server can be used to query the current list of services inclu
 
 | Endpoint                       | HTTP Method | Description                                     |
 | ------------------------------ |-------------| ------------------------------------------------|
-| http://HOST:PORT**/services/** | GET         | Return a list of current services and responses |
+| http://[HOST]:[PORT]/services/ | GET         | Return a list of current services and responses |
 
 The methods can be easily tested using a normal web browser, or from the shell using a tool such as `curl`.
+
+For example:
+
+```
+$ curl http://localhost:10010/services/
+[
+  {
+    "host": "127.0.0.1",
+    "id": "785d0a58-2a28-48f4-92e3-77435239e672",
+    "name": "Local",
+    "type": "icmp",
+    "group": "Echo",
+    "interval": 10000,
+    "warning": 1000,
+    "error": 5000,
+    "response": {
+      "status": "OK",
+      "time": 1,
+      "message": "Host available",
+      "updated": "Dec 6, 2016 10:46:04 AM"
+    }
+  }
+]
+```
 
 Screenshots
 -----------
