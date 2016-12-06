@@ -99,6 +99,17 @@ For example:
 jdbc:mysql://127.0.0.1:3306/test
 ```
 
+HTTP Server
+-----------
+
+The built-in HTTP server can be used to query the current list of services including the latest status from each. The interface is a JSON-based restful API, as defined below.
+
+| Endpoint                       | HTTP Method | Description                                     |
+| ------------------------------ |-------------| ------------------------------------------------|
+| http://HOST:PORT**/services/** | GET         | Return a list of current services and responses |
+
+The methods can be easily tested using a normal web browser, or from the shell using a tool such as `curl`.
+
 Screenshots
 -----------
 
