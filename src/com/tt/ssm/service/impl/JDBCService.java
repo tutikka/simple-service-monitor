@@ -22,11 +22,11 @@ public class JDBCService extends Service {
 	
 	private String username;
 	
-	private char[] password;
+	private String password;
 	
 	private String query;
 	
-	public JDBCService(String name, String group, String driver, String url, String username, char[] password, String query, long interval, long warning, long error) {
+	public JDBCService(String name, String group, String driver, String url, String username, String password, String query, long interval, long warning, long error) {
 		logger.i("init");
 		super.setId(UUID.randomUUID().toString());
 		super.setType(TYPE_JDBC);
@@ -65,7 +65,7 @@ public class JDBCService extends Service {
 			Class.forName(driver);
 			if (username != null && password != null) {
 				logger.i("connecting to jdbc url " + url + " (authenticating with username " + username + ")");
-				connection = DriverManager.getConnection(url, username, new String(password));
+				connection = DriverManager.getConnection(url, username, password);
 			} else {
 				logger.i("connecting to jdbc url " + url + " (no authentication)");
 				connection = DriverManager.getConnection(url);

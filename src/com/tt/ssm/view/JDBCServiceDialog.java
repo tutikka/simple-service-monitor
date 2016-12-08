@@ -136,8 +136,8 @@ public class JDBCServiceDialog extends JDialog implements ActionListener {
 			// ignore
 		}
 		// password
-		char[] password = this.password.getPassword();
-		if (password == null || password.length == 0) {
+		String password = new String(this.password.getPassword());
+		if (password == null || password.isEmpty()) {
 			// ignore
 		}
 		// query
