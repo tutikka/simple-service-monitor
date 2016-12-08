@@ -458,12 +458,18 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 		if (ServiceManager.getInstance().list().size() > 0) {
 			int result = JOptionPane.showConfirmDialog(SSMFrame.this, "All current services will be cancelled. Are you sure?", "Exit", JOptionPane.YES_NO_OPTION);
 			if (result == JOptionPane.YES_OPTION) {
+				if (SSMHttpServer.getInstance().isRunning()) {
+					SSMHttpServer.getInstance().stop();
+				}
 				ServiceManager.getInstance().cancel();
 				ServiceManager.getInstance().unregisterCallback(SSMFrame.this);
 				ServiceManager.getInstance().close();
 				dispose();
 			}
 		} else {
+			if (SSMHttpServer.getInstance().isRunning()) {
+				SSMHttpServer.getInstance().stop();
+			}
 			ServiceManager.getInstance().unregisterCallback(SSMFrame.this);
 			ServiceManager.getInstance().close();
 			dispose();

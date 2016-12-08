@@ -48,4 +48,17 @@ public class SSMHttpServer {
 		return (result);
 	}
 	
+	public boolean isRunning() {
+		if (executorService == null) {
+			return (false);
+		}
+		if (executorService.isShutdown()) {
+			return (false);
+		}
+		if (executorService.isTerminated()) {
+			return (false);
+		}
+		return (true);
+	}
+	
 }
