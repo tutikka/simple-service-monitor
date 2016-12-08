@@ -1,7 +1,7 @@
 Simple Service Monitor
 ======================
 
-![ScreenShot](/screenshots/services.png)
+![ScreenShot](/screenshots/feature.png)
 
 Status
 ------
@@ -108,10 +108,10 @@ The built-in HTTP server can be used to query the current list of services inclu
 
 | Endpoint                           | HTTP Method | Description                                     |
 | ---------------------------------- |-------------| ------------------------------------------------|
-| http://[HOST]:[PORT]/services      | GET         | Return a list of current services and responses |
-| http://[HOST]:[PORT]/services/[ID] | GET         | Return an existing service and response         |
-| http://[HOST]:[PORT]/services      | POST        | Schedule a new service                          |
-| http://[HOST]:[PORT]/services/[ID] | DELETE      | Cancel an existing service                      |
+| `http://[HOST]:[PORT]/services`      | GET         | Return a list of current services and responses |
+| `http://[HOST]:[PORT]/services/[ID]` | GET         | Return an existing service and response         |
+| `http://[HOST]:[PORT]/services`      | POST        | Schedule a new service                          |
+| `http://[HOST]:[PORT]/services/[ID]` | DELETE      | Cancel an existing service                      |
 
 The methods can be easily tested using a normal web browser, or from the shell using a tool such as `curl`.
 
