@@ -1,14 +1,18 @@
 package com.tt.ssm.server;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class HttpRequestHead extends HttpHead {
 	
 	private String method;
 	
 	private String uri;
 	
-	private String query;
+	private Map<String, String> parameters;
 	
 	public HttpRequestHead() {
+		parameters = new HashMap<>();
 	}
 
 	public String getMethod() {
@@ -27,12 +31,12 @@ public class HttpRequestHead extends HttpHead {
 		this.uri = uri;
 	}
 
-	public String getQuery() {
-		return query;
+	public Map<String, String> getParameters() {
+		return parameters;
 	}
 
-	public void setQuery(String query) {
-		this.query = query;
+	public void setParameters(Map<String, String> parameters) {
+		this.parameters = parameters;
 	}
 	
 }

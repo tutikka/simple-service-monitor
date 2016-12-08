@@ -1,55 +1,70 @@
 package com.tt.ssm.server;
 
-import java.io.BufferedReader;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 
 public class HttpIO {
-
-	private static boolean isHeadTerminated(String line) {
-		return (line == null || line.isEmpty());
-	}
 	
 	public static HttpRequestHead readRequestHead(InputStream in) throws Exception {
 		HttpRequestHead head = new HttpRequestHead();
-		BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-		String line = null;
-		int i = 0;
-		while (!isHeadTerminated(line = br.readLine())) {
-			if (i == 0) {
-				StringTokenizer st = new StringTokenizer(line, " ");
-				if (st.countTokens() == 3) {
-					head.setMethod(st.nextToken().trim());
-					String uri = st.nextToken().trim();
-					int j = uri.indexOf("?");
-					if (j == -1) {
+		int lineNumber = 1;
+		int b;
+		StringBuilder sb = new StringBuilder();
+		while ((b = in.read()) != -1) {
+			if (b == 10) {
+				String line = sb.toString();
+				if (line.isEmpty()) {
+					break;
+				}
+				if (lineNumber == 1) {
+					StringTokenizer st = new StringTokenizer(line, " ");
+					if (st.countTokens() == 3) {
+						String method = st.nextToken().trim();
+						String uri = URLDecoder.decode(st.nextToken().trim(), "UTF-8");
+						String version = st.nextToken().trim();
+						int index = uri.indexOf("?");
+						if (index != -1) {
+							StringTokenizer st2 = new StringTokenizer(uri.substring(index + 1), "&");
+							while (st2.hasMoreTokens()) {
+								String[] parts = st2.nextToken().split("=");
+								if (parts != null && parts.length == 2) {
+									String name = parts[0];
+									String value = parts[1];
+									head.getParameters().put(name, value);
+								}
+							}
+							uri = uri.substring(0, index);
+						}
+						head.setMethod(method);
 						head.setUri(uri);
-					} else {
-						head.setUri(uri.substring(0, j));
-						head.setQuery(uri.substring(j));
+						head.setVersion(version);
 					}
-					head.setProtocol(st.nextToken().trim());
+				} else {
+					int index = line.indexOf(":");
+					if (index > 0) {
+						String name = line.substring(0, index).trim();
+						List<String> values = Arrays.asList(line.substring(index + 1).trim().split(","));
+						head.getHeaders().put(name, values);
+					}
 				}
+				sb = new StringBuilder();
+				lineNumber++;
+			} else if (b == 13) {
+				// ignore
 			} else {
-				int j = line.indexOf(":");
-				if (j != -1) {
-					String name = line.substring(0, j);
-					List<String> values = Arrays.asList(line.substring(j + 2).split(","));
-					head.getHeaders().put(name, values);
-				}
+				sb.append((char) b);
 			}
-			i++;
 		}
 		return (head);
 	}
 	
 	public static void writeResponseHead(HttpResponseHead head, OutputStream out) throws Exception {
 		StringBuilder sb = new StringBuilder();
-		sb.append(head.getProtocol());
+		sb.append(head.getVersion());
 		sb.append(" ");
 		sb.append(head.getStatus());
 		sb.append(" ");

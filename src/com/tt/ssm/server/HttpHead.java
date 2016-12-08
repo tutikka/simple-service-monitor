@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class HttpHead {
 
-	private String protocol;
+	private String version;
 
 	private Map<String, List<String>> headers;
 	
@@ -39,12 +39,12 @@ public class HttpHead {
 		}
 	}
 	
-	public String getProtocol() {
-		return protocol;
+	public String getVersion() {
+		return version;
 	}
 
-	public void setProtocol(String protocol) {
-		this.protocol = protocol;
+	public void setVersion(String protocol) {
+		this.version = protocol;
 	}
 	
 	public Map<String, List<String>> getHeaders() {
