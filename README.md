@@ -138,3 +138,28 @@ $ curl http://localhost:10010/services/
   }
 ]
 ```
+
+### Example: Schedule Service
+
+```
+curl -X POST http://localhost:10010/services -d @service.json -H "Content-Type: application/json"
+```
+
+Where `service.json` contains:
+
+```
+{
+  "driver": "com.mysql.jdbc.Driver",
+  "url": "jdbc:mysql://localhost/test?useSSL=false",
+  "username": "test",
+  "password": "test",
+  "query": "SELECT 1",
+  "id": "9ec97a16-33c6-4b3f-9283-25e03f361401",
+  "name": "MySQL / test",
+  "type": "jdbc",
+  "group": "database",
+  "interval": 10000,
+  "warning": 1000,
+  "error": 5000
+}
+```
