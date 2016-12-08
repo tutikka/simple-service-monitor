@@ -1,6 +1,8 @@
 Simple Service Monitor
 ======================
 
+![ScreenShot](/screenshots/services.png)
+
 Status
 ------
 
@@ -136,10 +138,3 @@ $ curl http://localhost:10010/services/
   }
 ]
 ```
-
-Screenshots
------------
-
-![ScreenShot](/screenshots/services.png)
-
-![ScreenShot](/screenshots/service_details.png)
