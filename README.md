@@ -106,19 +106,19 @@ HTTP Server
 
 The built-in HTTP server can be used to query the current list of services including the latest status from each. The interface is a JSON-based restful API, as defined below.
 
-| Endpoint                           | HTTP Method | Description                                     |
-| ---------------------------------- |-------------| ------------------------------------------------|
-| `http://[HOST]:[PORT]/services`      | GET         | Return a list of current services and responses |
-| `http://[HOST]:[PORT]/services/[ID]` | GET         | Return an existing service and response         |
-| `http://[HOST]:[PORT]/services`      | POST        | Schedule a new service                          |
-| `http://[HOST]:[PORT]/services/[ID]` | DELETE      | Cancel an existing service                      |
+| Endpoint                              | HTTP Method | Description                                     |
+| --------------------------------------|-------------|-------------------------------------------------|
+| http://[HOST]:[PORT]/services         | GET         | Return a list of current services and responses |
+| http://[HOST]:[PORT]/services         | POST        | Schedule a new service                          |
+| http://[HOST]:[PORT]/services?id=[ID] | PUT         | Update response to an existing service (relay)  |
+| http://[HOST]:[PORT]/services?id=[ID] | DELETE      | Cancel an existing service                      |
 
 The methods can be easily tested using a normal web browser, or from the shell using a tool such as `curl`.
 
 ### Example: List Services
 
 ```
-$ curl http://localhost:10010/services/
+$ curl http://localhost:10010/services
 [
   {
     "host": "127.0.0.1",
@@ -142,7 +142,7 @@ $ curl http://localhost:10010/services/
 ### Example: Schedule Service
 
 ```
-curl -X POST http://localhost:10010/services -d @service.json -H "Content-Type: application/json"
+$ curl -X POST http://localhost:10010/services -d @service.json -H "Content-Type: application/json"
 ```
 
 Where `service.json` contains:
@@ -162,4 +162,10 @@ Where `service.json` contains:
   "warning": 1000,
   "error": 5000
 }
+```
+
+### Example: Cancel Service
+
+```
+$ curl -X DELETE "http://localhost:10010/services?id=9ec97a16-33c6-4b3f-9283-25e03f361401"
 ```

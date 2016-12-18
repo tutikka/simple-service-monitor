@@ -36,17 +36,17 @@ public class ClientRunnable implements Runnable {
 			in = new BufferedInputStream(socket.getInputStream());
 			out = new BufferedOutputStream(socket.getOutputStream());
 			requestHead = HttpIO.readRequestHead(in);
-			// get
-			if ("get".equalsIgnoreCase(requestHead.getMethod())) {
-				if (requestHead.getUri().toLowerCase().endsWith("/services")) {
+			if (requestHead.getUri().toLowerCase().endsWith("/services")) {
+				if ("get".equalsIgnoreCase(requestHead.getMethod())) {
 					handleGetServices(out);
 					return;
 				}
-			}
-			// post
-			if ("post".equalsIgnoreCase(requestHead.getMethod())) {
-				if (requestHead.getUri().toLowerCase().endsWith("/services")) {
+				if ("post".equalsIgnoreCase(requestHead.getMethod())) {
 					handlePostService(requestHead, in, out);
+					return;
+				}
+				if ("delete".equalsIgnoreCase(requestHead.getMethod())) {
+					handleDeleteService(requestHead, in, out);
 					return;
 				}
 			}
@@ -83,11 +83,8 @@ public class ClientRunnable implements Runnable {
 	
 	private void handlePostService(HttpRequestHead requestHead, InputStream in, OutputStream out) throws Exception {
 		logger.i("handlePostService");
-		
 		long l = Long.parseLong(requestHead.getHeaderFirstValue("Content-Length"));
-		
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		
 		byte[] b = new byte[32 * 1024];
 		long t = 0;
 		int i = -1;
@@ -98,11 +95,9 @@ public class ClientRunnable implements Runnable {
 				break;
 			}
 		}
-		
 		Gson gson = new GsonBuilder().registerTypeAdapter(Service.class, new ServiceDeserializer()).create();
 		Service service = gson.fromJson(new String(baos.toByteArray(), "UTF-8"), Service.class);
 		ServiceManager.getInstance().schedule(service);
-		
 		HttpResponseHead responseHead = new HttpResponseHead();
 		responseHead.setVersion("HTTP/1.1");
 		responseHead.setStatus(200);
@@ -112,7 +107,6 @@ public class ClientRunnable implements Runnable {
 		responseHead.addHeader("Server", "ssm");
 		responseHead.addHeader("Connection", "close");
 		HttpIO.writeResponseHead(responseHead, out);
-		
 		logger.i("handlePostService completed");
 	}
 	
@@ -122,11 +116,29 @@ public class ClientRunnable implements Runnable {
 	}
 	*/
 	
-	/*
-	private void handleDeleteService(InputStream in, OutputStream out) throws Exception {
-		// todo
+	private void handleDeleteService(HttpRequestHead requestHead, InputStream in, OutputStream out) throws Exception {
+		logger.i("handleDeleteService");
+		String id = requestHead.getParameters().get("id");
+		if (id == null) {
+			handleBadRequest(out);
+			return;
+		}
+		int i = ServiceManager.getInstance().cancel(id);
+		if (i == 0) {
+			handleNotFound(out);
+			return;
+		}
+		HttpResponseHead responseHead = new HttpResponseHead();
+		responseHead.setVersion("HTTP/1.1");
+		responseHead.setStatus(200);
+		responseHead.setMessage("OK");
+		responseHead.addHeader("Cache-Control", "private, max-age=0");
+		responseHead.addHeader("Expires", "-1");
+		responseHead.addHeader("Server", "ssm");
+		responseHead.addHeader("Connection", "close");
+		HttpIO.writeResponseHead(responseHead, out);
+		logger.i("handleDeleteService completed");
 	}
-	*/
 	
 	private void handleGetServices(OutputStream out) throws Exception {
 		logger.i("handleGetServices");
@@ -147,6 +159,22 @@ public class ClientRunnable implements Runnable {
 		HttpIO.writeResponseHead(responseHead, out);
 		out.write(s.getBytes("UTF-8"));
 		logger.i("handleGetServices completed");
+	}
+	
+	private void handleBadRequest(OutputStream out) throws Exception {
+		logger.i("handleBadRequest");
+		String s = "<html><head><title>400 - Bad Request</title><body>The request sent by the client was malformed.</body></html>";
+		HttpResponseHead responseHead = new HttpResponseHead();
+		responseHead.setVersion("HTTP/1.1");
+		responseHead.setStatus(400);
+		responseHead.setMessage("Not Found");
+		responseHead.addHeader("Content-Length", "" + s.length());
+		responseHead.addHeader("Content-Type", "text/html; charset=UTF-8");
+		responseHead.addHeader("Server", "ssm");
+		responseHead.addHeader("Connection", "close");
+		HttpIO.writeResponseHead(responseHead, out);
+		out.write(s.getBytes("UTF-8"));
+		logger.i("handleBadRequest completed");
 	}
 	
 	private void handleNotFound(OutputStream out) throws Exception {

@@ -73,29 +73,34 @@ public class ServiceManager {
 		logger.i("schedule completed");
 	}
 	
-	public void cancel() {
+	public int cancel() {
 		logger.i("cancel");
+		int i = 0;
 		for (Iterator<FutureWrapper> iterator = futures.iterator(); iterator.hasNext(); ) {
 			FutureWrapper wrapper = iterator.next();
 			logger.i("cancelling service " + wrapper.getService());
 			wrapper.getFuture().cancel(false);
 			iterator.remove();
+			i++;
 			for (Callback callback : callbacks) {
 				callback.onServiceCancelled(wrapper.getService());
 			}
 			logger.i("service cancelled");
 		}
 		logger.i("cancel completed");
+		return (i);
 	}
 	
-	public void cancel(Service service) {
+	public int cancel(Service service) {
 		logger.i("cancel");
+		int i = 0;
 		for (Iterator<FutureWrapper> iterator = futures.iterator(); iterator.hasNext(); ) {
 			FutureWrapper wrapper = iterator.next();
 			if (wrapper.getService().equals(service)) {
 				logger.i("cancelling service " + wrapper.getService());
 				wrapper.getFuture().cancel(false);
 				iterator.remove();
+				i++;
 				for (Callback callback : callbacks) {
 					callback.onServiceCancelled(wrapper.getService());
 				}
@@ -103,6 +108,27 @@ public class ServiceManager {
 			}
 		}
 		logger.i("cancel completed");
+		return (i);
+	}
+	
+	public int cancel(String id) {
+		logger.i("cancel");
+		int i = 0;
+		for (Iterator<FutureWrapper> iterator = futures.iterator(); iterator.hasNext(); ) {
+			FutureWrapper wrapper = iterator.next();
+			if (wrapper.getService().getId().equals(id)) {
+				logger.i("cancelling service " + wrapper.getService());
+				wrapper.getFuture().cancel(false);
+				iterator.remove();
+				i++;
+				for (Callback callback : callbacks) {
+					callback.onServiceCancelled(wrapper.getService());
+				}
+				logger.i("service cancelled");
+			}
+		}
+		logger.i("cancel completed");
+		return (i);
 	}
 	
 	public List<Service> list() {
