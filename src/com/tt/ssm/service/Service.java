@@ -1,6 +1,6 @@
 package com.tt.ssm.service;
 
-public abstract class Service implements Comparable<Service> {
+public abstract class Service {
 	
 	public static final String TYPE_URL = "url";
 	
@@ -29,10 +29,20 @@ public abstract class Service implements Comparable<Service> {
 	public abstract void request();
 	
 	public abstract String getDestination();
-	
+
 	@Override
-	public int compareTo(Service o) {
-		return (this.id.compareTo(o.id));
+	public int hashCode() {
+		return (id.hashCode());
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Service) {
+			Service another = (Service) obj;
+			return (id.equals(another.getId()));
+		} else {
+			return (false);
+		}
 	}
 
 	public String getId() {

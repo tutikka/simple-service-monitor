@@ -19,6 +19,14 @@ public class ServiceRunner implements Runnable {
 		this.callbacks = callbacks;
 	}
 
+	public Service getService() {
+		return service;
+	}
+
+	public void setService(Service service) {
+		this.service = service;
+	}
+
 	@Override
 	public void run() {
 		logger.i("run");

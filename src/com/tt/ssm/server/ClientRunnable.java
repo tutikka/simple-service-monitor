@@ -49,6 +49,10 @@ public class ClientRunnable implements Runnable {
 					handleDeleteService(requestHead, in, out);
 					return;
 				}
+				if ("put".equalsIgnoreCase(requestHead.getMethod())) {
+					handlePutService(requestHead, in, out);
+					return;
+				}
 			}
 			handleNotFound(out);
 		} catch (Exception e) {
@@ -110,11 +114,43 @@ public class ClientRunnable implements Runnable {
 		logger.i("handlePostService completed");
 	}
 	
-	/*
-	private void handlePutService(InputStream in, OutputStream out) throws Exception {
-		// todo
+	private void handlePutService(HttpRequestHead requestHead, InputStream in, OutputStream out) throws Exception {
+		logger.i("handlePutService");
+		String id = requestHead.getParameters().get("id");
+		if (id == null) {
+			handleBadRequest(out);
+			return;
+		}
+		long l = Long.parseLong(requestHead.getHeaderFirstValue("Content-Length"));
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		byte[] b = new byte[32 * 1024];
+		long t = 0;
+		int i = -1;
+		while ((i = in.read(b)) != -1) {
+			baos.write(b, 0, i);
+			t += i;
+			if (t >= l) {
+				break;
+			}
+		}
+		Gson gson = new GsonBuilder().registerTypeAdapter(Service.class, new ServiceDeserializer()).create();
+		Service service = gson.fromJson(new String(baos.toByteArray(), "UTF-8"), Service.class);
+		int numUpdated = ServiceManager.getInstance().update(id, service);
+		if (numUpdated == 0) {
+			handleNotFound(out);
+			return;
+		}
+		HttpResponseHead responseHead = new HttpResponseHead();
+		responseHead.setVersion("HTTP/1.1");
+		responseHead.setStatus(200);
+		responseHead.setMessage("OK");
+		responseHead.addHeader("Cache-Control", "private, max-age=0");
+		responseHead.addHeader("Expires", "-1");
+		responseHead.addHeader("Server", "ssm");
+		responseHead.addHeader("Connection", "close");
+		HttpIO.writeResponseHead(responseHead, out);
+		logger.i("handlePutService completed");
 	}
-	*/
 	
 	private void handleDeleteService(HttpRequestHead requestHead, InputStream in, OutputStream out) throws Exception {
 		logger.i("handleDeleteService");
@@ -123,8 +159,8 @@ public class ClientRunnable implements Runnable {
 			handleBadRequest(out);
 			return;
 		}
-		int i = ServiceManager.getInstance().cancel(id);
-		if (i == 0) {
+		int numCancelled = ServiceManager.getInstance().cancel(id);
+		if (numCancelled == 0) {
 			handleNotFound(out);
 			return;
 		}

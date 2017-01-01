@@ -92,6 +92,12 @@ public class ServiceDetailsDialog extends JDialog implements ActionListener, Cal
 
 	/* ********** private ********** */
 	
+	@Override
+	public void onServiceUpdated(Service service) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	private JPanel createContentPanel() {
 		series = new TimeSeries("Time");
 		TimeSeriesCollection collection = new TimeSeriesCollection(series);

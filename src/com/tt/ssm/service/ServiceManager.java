@@ -65,12 +65,32 @@ public class ServiceManager {
 	
 	public void schedule(Service service) {
 		logger.i("schedule");
-		ScheduledFuture<?> future = ses.scheduleAtFixedRate(new ServiceRunner(service, callbacks), service.getInterval(), service.getInterval(), TimeUnit.MILLISECONDS);
-		futures.add(new FutureWrapper(future, service));
+		ServiceRunner serviceRunner = new ServiceRunner(service, callbacks);
+		ScheduledFuture<?> future = ses.scheduleAtFixedRate(serviceRunner, service.getInterval(), service.getInterval(), TimeUnit.MILLISECONDS);
+		futures.add(new FutureWrapper(future, serviceRunner));
 		for (Callback callback : callbacks) {
 			callback.onServiceScheduled(service);
 		}
 		logger.i("schedule completed");
+	}
+	
+	public int update(String id, Service service) {
+		logger.i("update");
+		int i = 0;
+		for (Iterator<FutureWrapper> iterator = futures.iterator(); iterator.hasNext(); ) {
+			FutureWrapper wrapper = iterator.next();
+			if (wrapper.getServiceRunner().getService().equals(service)) {
+				logger.i("updating service " + wrapper.getServiceRunner().getService());
+				wrapper.getServiceRunner().setService(service);
+				i++;
+				for (Callback callback : callbacks) {
+					callback.onServiceUpdated(wrapper.getServiceRunner().getService());
+				}
+				logger.i("service updated");
+			}
+		}
+		logger.i("update completed");
+		return (i);
 	}
 	
 	public int cancel() {
@@ -78,12 +98,12 @@ public class ServiceManager {
 		int i = 0;
 		for (Iterator<FutureWrapper> iterator = futures.iterator(); iterator.hasNext(); ) {
 			FutureWrapper wrapper = iterator.next();
-			logger.i("cancelling service " + wrapper.getService());
+			logger.i("cancelling service " + wrapper.getServiceRunner().getService());
 			wrapper.getFuture().cancel(false);
 			iterator.remove();
 			i++;
 			for (Callback callback : callbacks) {
-				callback.onServiceCancelled(wrapper.getService());
+				callback.onServiceCancelled(wrapper.getServiceRunner().getService());
 			}
 			logger.i("service cancelled");
 		}
@@ -96,13 +116,13 @@ public class ServiceManager {
 		int i = 0;
 		for (Iterator<FutureWrapper> iterator = futures.iterator(); iterator.hasNext(); ) {
 			FutureWrapper wrapper = iterator.next();
-			if (wrapper.getService().equals(service)) {
-				logger.i("cancelling service " + wrapper.getService());
+			if (wrapper.getServiceRunner().getService().equals(service)) {
+				logger.i("cancelling service " + wrapper.getServiceRunner().getService());
 				wrapper.getFuture().cancel(false);
 				iterator.remove();
 				i++;
 				for (Callback callback : callbacks) {
-					callback.onServiceCancelled(wrapper.getService());
+					callback.onServiceCancelled(wrapper.getServiceRunner().getService());
 				}
 				logger.i("service cancelled");
 			}
@@ -116,13 +136,13 @@ public class ServiceManager {
 		int i = 0;
 		for (Iterator<FutureWrapper> iterator = futures.iterator(); iterator.hasNext(); ) {
 			FutureWrapper wrapper = iterator.next();
-			if (wrapper.getService().getId().equals(id)) {
-				logger.i("cancelling service " + wrapper.getService());
+			if (wrapper.getServiceRunner().getService().getId().equals(id)) {
+				logger.i("cancelling service " + wrapper.getServiceRunner().getService());
 				wrapper.getFuture().cancel(false);
 				iterator.remove();
 				i++;
 				for (Callback callback : callbacks) {
-					callback.onServiceCancelled(wrapper.getService());
+					callback.onServiceCancelled(wrapper.getServiceRunner().getService());
 				}
 				logger.i("service cancelled");
 			}
@@ -136,7 +156,7 @@ public class ServiceManager {
 		List<Service> services = new ArrayList<>();
 		for (Iterator<FutureWrapper> iterator = futures.iterator(); iterator.hasNext(); ) {
 			FutureWrapper wrapper = iterator.next();
-			services.add(wrapper.getService());
+			services.add(wrapper.getServiceRunner().getService());
 		}
 		logger.i("list completed");
 		return (services);
@@ -147,7 +167,7 @@ public class ServiceManager {
 		List<Service> services = new ArrayList<>();
 		for (Iterator<FutureWrapper> iterator = futures.iterator(); iterator.hasNext(); ) {
 			FutureWrapper wrapper = iterator.next();
-			services.add(wrapper.getService());
+			services.add(wrapper.getServiceRunner().getService());
 		}
 		try {
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -192,25 +212,27 @@ public class ServiceManager {
 		
 		public void onServiceCancelled(Service service);
 		
+		public void onServiceUpdated(Service service);
+		
 	}
 	
 	private class FutureWrapper {
 		
 		private ScheduledFuture<?> future;
 		
-		private Service service;
+		private ServiceRunner serviceRunner;
 		
-		private FutureWrapper(ScheduledFuture<?> future, Service service) {
+		private FutureWrapper(ScheduledFuture<?> future, ServiceRunner serviceRunner) {
 			this.future = future;
-			this.service = service;
+			this.serviceRunner = serviceRunner;
 		}
 
 		public ScheduledFuture<?> getFuture() {
 			return future;
 		}
-
-		public Service getService() {
-			return service;
+		
+		public ServiceRunner getServiceRunner() {
+			return serviceRunner;
 		}
 		
 	}

@@ -341,6 +341,16 @@ public class SSMFrame extends JFrame implements ActionListener, MouseListener, U
 	}
 
 	@Override
+	public void onServiceUpdated(final Service service) {
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				ctm.update(service);
+			}
+		});
+	}
+	
+	@Override
 	public void onServerStartRequested(final String host, final int port) {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
