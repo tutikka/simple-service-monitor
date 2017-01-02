@@ -203,7 +203,7 @@ public class ClientRunnable implements Runnable {
 		HttpResponseHead responseHead = new HttpResponseHead();
 		responseHead.setVersion("HTTP/1.1");
 		responseHead.setStatus(400);
-		responseHead.setMessage("Not Found");
+		responseHead.setMessage("Bad Request");
 		responseHead.addHeader("Content-Length", "" + s.length());
 		responseHead.addHeader("Content-Type", "text/html; charset=UTF-8");
 		responseHead.addHeader("Server", "ssm");
