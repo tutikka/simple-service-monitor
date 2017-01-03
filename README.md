@@ -3,8 +3,8 @@ Simple Service Monitor
 
 ![ScreenShot](/screenshots/feature.png)
 
-Status
-------
+Build Status
+------------
 
 [![Build Status](https://travis-ci.org/tutikka/simple-service-monitor.svg?branch=master)](https://travis-ci.org/tutikka/simple-service-monitor)
 
@@ -13,10 +13,10 @@ Features
 
 Simple Service Monitor is a tool to monitor your services for outages or increases in latency.
 
-- Desktop application to set up various kinds of services and provide a dashboard view
-- Graphical trend of each service
-- Save, open and import list of services from disk (JSON)
-- HTTP server with restful API to query services
+- Desktop application to set up different types of services and provide a status view and graphical trend of each service
+- Save, open and import services from disk
+- HTML5 page to quickly view status using a browser (desktop, mobile, etc.) 
+- HTTP server with JSON-based restful API to manage services
 
 Available service types:
 
@@ -101,10 +101,29 @@ For example:
 jdbc:mysql://127.0.0.1:3306/test
 ```
 
-HTTP Server
+Status Page
 -----------
 
-The built-in HTTP server can be used to query the current list of services including the latest status from each. The interface is a JSON-based restful API, as defined below.
+The built-in HTTP server provides a simple status page to view an overall summary of services using a browser. The page can be access at:
+
+```
+http://[HOST]:[PORT]/status
+```
+
+For example:
+
+```
+http://127.0.0.1:10010/status
+```
+
+An example screenshot is shown below:
+
+![ScreenShot](/screenshots/status.png)
+
+HTTP API
+--------
+
+The built-in HTTP server can also be used to query the current list of services including the latest status from each. The interface is a JSON-based restful API, as defined below.
 
 | Endpoint                              | HTTP Method | Description                                     |
 | --------------------------------------|-------------|-------------------------------------------------|

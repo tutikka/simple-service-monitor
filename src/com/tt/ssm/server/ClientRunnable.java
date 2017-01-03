@@ -6,11 +6,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.tt.ssm.misc.Logger;
+import com.tt.ssm.service.Response;
 import com.tt.ssm.service.Service;
 import com.tt.ssm.service.ServiceDeserializer;
 import com.tt.ssm.service.ServiceManager;
@@ -36,6 +39,12 @@ public class ClientRunnable implements Runnable {
 			in = new BufferedInputStream(socket.getInputStream());
 			out = new BufferedOutputStream(socket.getOutputStream());
 			requestHead = HttpIO.readRequestHead(in);
+			if (requestHead.getUri().toLowerCase().endsWith("/status")) {
+				if ("get".equalsIgnoreCase(requestHead.getMethod())) {
+					handleGetStatus(out);
+					return;
+				}
+			}
 			if (requestHead.getUri().toLowerCase().endsWith("/services")) {
 				if ("get".equalsIgnoreCase(requestHead.getMethod())) {
 					handleGetServices(out);
@@ -84,6 +93,84 @@ public class ClientRunnable implements Runnable {
 	}
 
 	/* ********** private ********* */
+	
+	private void handleGetStatus(OutputStream out) throws Exception {
+		logger.i("handleGetStatus");
+		SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+		int oks = 0;
+		int warnings = 0;
+		int errors = 0;
+		List<Service> services = ServiceManager.getInstance().list();
+		for (Service service : services) {
+			Response response = service.getResponse();
+			if (response != null && "OK".equals(response.getStatus())) {
+				oks++;
+			}
+			if (response != null && "WARNING".equals(response.getStatus())) {
+				warnings++;
+			}
+			if (response != null && "ERROR".equals(response.getStatus())) {
+				errors++;
+			}
+		}
+		StringBuilder sb = new StringBuilder();
+		sb.append("<!DOCTYPE html>\n");
+		sb.append("<html lang='en'>\n");
+		sb.append("  <head>\n");
+		sb.append("    <title>Simple Service Monitor - Status</title>\n");
+		sb.append("    <meta charset='utf-8'>\n");
+		sb.append("    <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' integrity='sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u' crossorigin='anonymous'>\n");
+		sb.append("    <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css' integrity='sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp' crossorigin='anonymous'>\n");
+		sb.append("  </head>\n");
+		sb.append("  <body>\n");
+		sb.append("    <div class='container'>\n");
+		sb.append("      <h3>Simple Service Monitor - Status</h3>\n");
+		if (errors > 0) {
+			sb.append("<div class='alert alert-danger'>" + errors + " service(s) reported errors</div>\n");
+		} else if (warnings > 0) {
+			sb.append("<div class='alert alert-warning'>" + warnings + " service(s) reported warnings</div>\n");
+		} else if (oks > 0) {
+			sb.append("<div class='alert alert-success'>" + oks + " service(s) ok</div>\n");
+		}
+		sb.append("      <table class='table'>\n");
+		for (Service service : ServiceManager.getInstance().list()) {
+			sb.append("<tr>");
+			sb.append("<td class='text-left'>");
+			sb.append(service.getName());
+			sb.append("</td>");
+			sb.append("<td class='text-left'>");
+			sb.append(service.getResponse() == null ? "- ? -" : "<strong>" + service.getResponse().getStatus() + "</strong>");
+			sb.append("</td>");
+			sb.append("<td class='text-left'>");
+			sb.append(service.getResponse() == null ? "- ? -" : service.getResponse().getTime() + " ms");
+			sb.append("</td>");
+			sb.append("<td class='text-right'>");
+			sb.append(service.getResponse() == null ? "- ? -" : sdf.format(service.getResponse().getUpdated()));
+			sb.append("</td>");
+			sb.append("</tr>\n");
+		}
+		sb.append("      </table>\n");
+		sb.append("      <hr>\n");
+		sb.append("      <p class='text-right text-muted'>" + sdf.format(new Date()) + "</p>\n");
+		sb.append("    </div>\n");
+		sb.append("    <script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js' integrity='sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa' crossorigin='anonymous'></script>\n");
+		sb.append("  <body>\n");
+		sb.append("</html>");
+		HttpResponseHead responseHead = new HttpResponseHead();
+		responseHead.setVersion("HTTP/1.1");
+		responseHead.setStatus(200);
+		responseHead.setMessage("OK");
+		responseHead.addHeader("Content-Length", "" + sb.length());
+		responseHead.addHeader("Cache-Control", "private, max-age=0");
+		responseHead.addHeader("Expires", "-1");
+		responseHead.addHeader("Content-Type", "text/html; charset=UTF-8");
+		responseHead.addHeader("Server", "ssm");
+		responseHead.addHeader("Accept-Ranges", "none");
+		responseHead.addHeader("Connection", "close");
+		HttpIO.writeResponseHead(responseHead, out);
+		out.write(sb.toString().getBytes("UTF-8"));
+		logger.i("handleGetStatus completed");
+	}
 	
 	private void handlePostService(HttpRequestHead requestHead, InputStream in, OutputStream out) throws Exception {
 		logger.i("handlePostService");
